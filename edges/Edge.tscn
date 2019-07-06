@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 5, 280 )
+
+[node name="Edge" type="Area2D"]
+collision_mask = 0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="collision_shape" type="CollisionShape2D" parent="."]
+position = Vector2( 250, -5 )
+shape = SubResource( 1 )
+
+[node name="outer_side" type="Position2D" parent="."]
+
+[node name="inner_side" type="Position2D" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_collision_area_body_entered"]
