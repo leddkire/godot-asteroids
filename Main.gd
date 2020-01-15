@@ -8,7 +8,7 @@ func _ready():
     var ships : Array = get_tree().get_nodes_in_group("ships")
     assert(ships.size() == 1)
     var ship = ships.front()
-    shipEdgePositionController = load("res://ShipEdgePositionController/ShipEdgePositionController.gd").new(ship,edges)
+    shipEdgePositionController = load("res://ShipEdgePositionController/ShipEdgePositionController.gd").new(edges)
     add_child(shipEdgePositionController)
 
 
