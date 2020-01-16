@@ -20,10 +20,15 @@ func _on_edge_exited(orientation : int, body : PhysicsBody2D, side_exited: int):
     if body.is_in_group(GroupConstants.DRIFTS):
         if side_exited == Edge_Side.OUTER:
             body.on_outer_edge_exited()
-        if side_exited == Edge_Side.INNER:
+        if (side_exited == Edge_Side.INNER and is_inside_screen(body)) :
             var ships : Array = self.get_tree().get_nodes_in_group(GroupConstants.SHIP)
             ships.erase(body)
             _reposition_ships_around(body,ships)
+
+func is_inside_screen(body):
+    var screen_width = ProjectSettings.get_setting("display/window/size/width")
+    var screen_height = ProjectSettings.get_setting("display/window/size/height")
+    return body.position.x < screen_width and body.position.x > 0 and body.position.y < screen_height and body.position.y > 0
 
 func _reposition_ships_around(object,objects):
     var screen_width = ProjectSettings.get_setting("display/window/size/width")
