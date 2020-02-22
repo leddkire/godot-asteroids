@@ -9,16 +9,16 @@
 [ext_resource path="res://edges/WestEdge.gd" type="Script" id=7]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 320, 30 )
+extents = Vector2( 320, 5 )
 
 [sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 320, 30 )
+extents = Vector2( 320, 5 )
 
 [sub_resource type="RectangleShape2D" id=3]
-extents = Vector2( 30, 320 )
+extents = Vector2( 5, 320 )
 
 [sub_resource type="RectangleShape2D" id=4]
-extents = Vector2( 30, 320 )
+extents = Vector2( 5, 320 )
 
 [node name="Main" type="Node2D"]
 script = ExtResource( 1 )
@@ -26,18 +26,18 @@ script = ExtResource( 1 )
 [node name="ship" parent="." groups=[
 "ships",
 ] instance=ExtResource( 2 )]
-position = Vector2( 30, 40 )
+position = Vector2( 480, 40 )
 collision_layer = 2
 
 [node name="south_edge" parent="." instance=ExtResource( 3 )]
 script = ExtResource( 4 )
 
 [node name="collision_shape" parent="south_edge" index="0"]
-position = Vector2( 250, 530 )
+position = Vector2( 250, 505 )
 shape = SubResource( 1 )
 
 [node name="outer_side" parent="south_edge" index="1"]
-position = Vector2( 250, 560 )
+position = Vector2( 250, 510 )
 
 [node name="inner_side" parent="south_edge" index="2"]
 position = Vector2( 250, 500 )
@@ -46,11 +46,10 @@ position = Vector2( 250, 500 )
 script = ExtResource( 5 )
 
 [node name="collision_shape" parent="north_edge" index="0"]
-position = Vector2( 250, -30 )
 shape = SubResource( 2 )
 
 [node name="outer_side" parent="north_edge" index="1"]
-position = Vector2( 250, -60 )
+position = Vector2( 250, -10 )
 
 [node name="inner_side" parent="north_edge" index="2"]
 position = Vector2( 250, 0 )
@@ -59,11 +58,11 @@ position = Vector2( 250, 0 )
 script = ExtResource( 6 )
 
 [node name="collision_shape" parent="east_edge" index="0"]
-position = Vector2( 530, 245 )
+position = Vector2( 505, 245 )
 shape = SubResource( 3 )
 
 [node name="outer_side" parent="east_edge" index="1"]
-position = Vector2( 560, 250 )
+position = Vector2( 510, 250 )
 
 [node name="inner_side" parent="east_edge" index="2"]
 position = Vector2( 500, 250 )
@@ -72,11 +71,11 @@ position = Vector2( 500, 250 )
 script = ExtResource( 7 )
 
 [node name="collision_shape" parent="west_edge" index="0"]
-position = Vector2( -30, 245 )
+position = Vector2( -5, 240 )
 shape = SubResource( 4 )
 
 [node name="outer_side" parent="west_edge" index="1"]
-position = Vector2( -60, 255 )
+position = Vector2( -10, 255 )
 
 [node name="inner_side" parent="west_edge" index="2"]
 position = Vector2( 0, 255 )

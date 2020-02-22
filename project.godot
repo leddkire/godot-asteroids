@@ -14,6 +14,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://edges/Edge.gd"
 }, {
+"base": "Reference",
+"class": "EntityScreenWrapRule",
+"language": "GDScript",
+"path": "res://rules/screen_wrap/EntityScreenWrapRule.gd"
+}, {
 "base": "Node",
 "class": "ShipEdgePositionController",
 "language": "GDScript",
@@ -21,6 +26,7 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "Edge": "",
+"EntityScreenWrapRule": "",
 "ShipEdgePositionController": ""
 }
 
@@ -34,11 +40,16 @@ config/icon="res://icon.png"
 
 Orientation="*res://Orientation/Orientation.gd"
 Edge_Side="*res://edges/Edge_Side.gd"
+GroupConstants="*res://GroupConstants.gd"
 
 [display]
 
 window/size/width=500
 window/size/height=500
+
+[editor_plugins]
+
+enabled=PoolStringArray( "gut" )
 
 [input]
 
