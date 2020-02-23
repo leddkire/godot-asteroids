@@ -4,18 +4,27 @@ export (float) var speed = 2.5
 var current_rotation_direction = 0
 export (float) var rotation_speed = 1.5
 
-onready var collision_layer_backup = self.collision_layer
-onready var collision_mask_backup = self.collision_mask
+var direction_vector : Vector2
+
+signal entity_shooting
 
 func _ready():
     set_physics_process(true)
     add_to_group(GroupConstants.SHIP)
     add_to_group(GroupConstants.DRIFTS)
 
+func _input(input_event : InputEvent):
+    if input_event.is_action("shoot_projectile"):
+        var pellet = self.spawn_pellet_projectile()
+        self.get_parent().add_child(pellet)
+
+
 func _physics_process(delta):
     current_rotation_direction = calculate_rotation_direction_from_input()
     rotation += current_rotation_direction * rotation_speed * delta
-    move_and_collide(calculate_velocity_from_input().rotated(rotation))
+    direction_vector = Vector2(1, 1).rotated(rotation)
+    var velocity_vector = calculate_velocity_from_input().rotated(rotation)
+    move_and_collide(velocity_vector)
 
 func calculate_rotation_direction_from_input():
     if Input.is_action_pressed("move_left"):
@@ -48,7 +57,6 @@ func hide_visuals():
 
 func on_edge_entered():
     if !is_showing_visuals() and physics_detection_is_disabled():
-        self.enable_physics_detection()
         self.show_visuals()
 
 func is_showing_visuals():
@@ -57,9 +65,14 @@ func is_showing_visuals():
 func physics_detection_is_disabled():
     return (self.collision_layer == 0) and (self.collision_mask == 1)
 
-func enable_physics_detection():
-    self.collision_layer = self.collision_layer_backup
-    self.collision_mask = self.collision_mask_backup
 
 func show_visuals():
     self.show()
+
+var pellet_scn = preload("res://projectiles/pellet/pellet.tscn")
+func spawn_pellet_projectile():
+    var pellet = pellet_scn.instance()
+    pellet.position = get_node("projectile_spawn").global_position
+    pellet.rotation = direction_vector.angle()
+    return pellet
+
