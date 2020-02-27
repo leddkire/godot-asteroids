@@ -15,7 +15,7 @@ func _ready():
 
 func _input(input_event : InputEvent):
     if input_event.is_action("shoot_projectile"):
-        var pellet = self.spawn_pellet_projectile()
+        var pellet = self.spawn_pellet_projectile(get_projectile_spawn_position(), direction_vector.angle())
         self.get_parent().add_child(pellet)
 
 
@@ -70,9 +70,11 @@ func show_visuals():
     self.show()
 
 var pellet_scn = preload("res://projectiles/pellet/pellet.tscn")
-func spawn_pellet_projectile():
+func spawn_pellet_projectile(spawn_position : Vector2, projectile_rotation : float):
     var pellet = pellet_scn.instance()
-    pellet.position = get_node("projectile_spawn").global_position
-    pellet.rotation = direction_vector.angle()
+    pellet.position = spawn_position
+    pellet.rotation = projectile_rotation
     return pellet
 
+func get_projectile_spawn_position():
+    return get_node("projectile_spawn").global_position
