@@ -8,8 +8,6 @@ onready var rotation_speed : float = 2.5
 onready var friction : float = 0.99
 onready var shooting_angle : float = 0
 
-signal entity_shooting
-
 func _ready():
 
     set_physics_process(true)
