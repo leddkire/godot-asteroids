@@ -7,12 +7,13 @@ onready var current_rotation_direction : int = 0
 onready var rotation_speed : float = 2.5
 onready var friction : float = 0.99
 onready var shooting_angle : float = 0
+var screen_id
 
 func _ready():
-
     set_physics_process(true)
     add_to_group(GroupConstants.SHIP)
     add_to_group(GroupConstants.DRIFTS)
+
 
 func _input(input_event : InputEvent):
     if input_event.is_action("shoot_projectile"):
@@ -77,3 +78,6 @@ func spawn_pellet_projectile(spawn_position : Vector2, projectile_rotation : flo
 
 func get_projectile_spawn_position():
     return get_node("projectile_spawn").global_position
+
+func set_new_position(pos: Vector2):
+    self.position = pos

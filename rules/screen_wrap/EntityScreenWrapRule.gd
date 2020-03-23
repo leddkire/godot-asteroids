@@ -24,5 +24,4 @@ func reposition_around(object,objects):
     position_object(objects.pop_front(),object.position.x - screen_width,object.position.y + screen_height)
 
 func position_object(object,x_value,y_value):
-    object.position.x = x_value
-    object.position.y = y_value
+    object.set_new_position(Vector2(x_value, y_value))
