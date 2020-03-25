@@ -20,14 +20,14 @@ _global_script_classes=[ {
 "path": "res://rules/screen_wrap/EntityScreenWrapRule.gd"
 }, {
 "base": "Node",
-"class": "ShipEdgePositionController",
+"class": "ScreenWrapController",
 "language": "GDScript",
-"path": "res://ShipEdgePositionController/ShipEdgePositionController.gd"
+"path": "res://ScreenWrapController/ScreenWrapController.gd"
 } ]
 _global_script_class_icons={
 "Edge": "",
 "EntityScreenWrapRule": "",
-"ShipEdgePositionController": ""
+"ScreenWrapController": ""
 }
 
 [application]
@@ -41,6 +41,7 @@ config/icon="res://icon.png"
 Orientation="*res://Orientation/Orientation.gd"
 Edge_Side="*res://edges/Edge_Side.gd"
 GroupConstants="*res://GroupConstants.gd"
+EntityCensus="*res://screen/EntityCensus.gd"
 
 [display]
 

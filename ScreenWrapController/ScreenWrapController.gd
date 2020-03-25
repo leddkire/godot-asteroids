@@ -1,12 +1,12 @@
 extends Node
-class_name ShipEdgePositionController
+class_name ScreenWrapController
 
 var edges
 var entity_screen_wrap_rule : EntityScreenWrapRule
 var entity_screen_census: EntityCensus
 
 func _ready():
-    self.set_name("ShipEdgePositionController")
+    self.set_name("ScreenWrapController")
 
 func _init(edges, entity_screen_wrap_rule, entity_screen_census: EntityCensus):
     self.edges = edges

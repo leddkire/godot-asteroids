@@ -12,8 +12,8 @@ func _ready():
 func create_ship_position_controller(wrap_rule: EntityScreenWrapRule):
     var edges : Array = get_tree().get_nodes_in_group("edges")
     assert(edges.size() == 4)
-    var shipEdgePositionController = load("res://ShipEdgePositionController/ShipEdgePositionController.gd").new(edges,wrap_rule,EntityCensus)
-    return shipEdgePositionController
+    var screenWrapController = load("res://ScreenWrapController/ScreenWrapController.gd").new(edges,wrap_rule,EntityCensus)
+    return screenWrapController
 
 
 func spawn_ship(wrap_rule : EntityScreenWrapRule):
