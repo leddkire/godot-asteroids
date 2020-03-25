@@ -1,4 +1,5 @@
 extends RigidBody2D
+class_name Asteroid
 
 var screen_id
 
@@ -17,3 +18,13 @@ func set_new_position(pos: Vector2):
 func _integrate_forces(state):
     # Empty because we want the body to stop moving.
     pass
+
+func pulverize():
+    queue_free()
+
+func can_be_split() -> bool:
+    return false
+
+func split():
+    queue_free()
+    return []

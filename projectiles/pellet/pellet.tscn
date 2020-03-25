@@ -21,4 +21,5 @@ region_rect = Rect2( 585, 59, 198, 46 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 1 )
+[connection signal="body_entered" from="." to="." method="_on_pellet_body_entered"]
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

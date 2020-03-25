@@ -9,6 +9,16 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "RigidBody2D",
+"class": "Asteroid",
+"language": "GDScript",
+"path": "res://asteroids/Asteroid.gd"
+}, {
+"base": "Node",
+"class": "BulletsWithAsteroidsRule",
+"language": "GDScript",
+"path": "res://rules/collision/BulletsWithAsteroidsRule.gd"
+}, {
 "base": "Area2D",
 "class": "Edge",
 "language": "GDScript",
@@ -25,6 +35,8 @@ _global_script_classes=[ {
 "path": "res://ScreenWrapController/ScreenWrapController.gd"
 } ]
 _global_script_class_icons={
+"Asteroid": "",
+"BulletsWithAsteroidsRule": "",
 "Edge": "",
 "EntityScreenWrapRule": "",
 "ScreenWrapController": ""
