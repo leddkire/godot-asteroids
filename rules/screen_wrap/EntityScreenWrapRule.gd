@@ -1,27 +1,33 @@
 class_name EntityScreenWrapRule
 
+var SCREEN_WIDTH
+var SCREEN_HEIGHT
+
 func _init():
-    pass
+    SCREEN_WIDTH = ProjectSettings.get_setting("display/window/size/width")
+    SCREEN_HEIGHT = ProjectSettings.get_setting("display/window/size/height")
 
 func reposition_around(object,objects):
-    var screen_width = ProjectSettings.get_setting("display/window/size/width")
-    var screen_height = ProjectSettings.get_setting("display/window/size/height")
-    #Position to the left
-    position_object(objects.pop_front(),object.position.x + screen_width,object.position.y)
-    #Position to the right
-    position_object(objects.pop_front(),object.position.x - screen_width, object.position.y)
-    #Position to the top
-    position_object(objects.pop_front(),object.position.x, object.position.y + screen_height)
-    #Position to the bottom
-    position_object(objects.pop_front(),object.position.x,object.position.y - screen_height)
-    #Position to the top-right corner
-    position_object(objects.pop_front(),object.position.x + screen_width,object.position.y - screen_height)
-    #Position to the top-left corner
-    position_object(objects.pop_front(),object.position.x - screen_width,object.position.y - screen_height)
-    #Position to the bottom-right corner
-    position_object(objects.pop_front(),object.position.x + screen_width,object.position.y + screen_height)
-    #Position to the bottom-left corner
-    position_object(objects.pop_front(),object.position.x - screen_width,object.position.y + screen_height)
+    for position in positions_around_screen(object):
+        objects.pop_front().set_new_position(position)
 
-func position_object(object,x_value,y_value):
-    object.set_new_position(Vector2(x_value, y_value))
+func positions_around_screen(object):
+    var left_side_of_screen = Vector2(object.position.x + SCREEN_WIDTH, object.position.y)
+    var right_side_of_screen = Vector2(object.position.x - SCREEN_WIDTH, object.position.y)
+    var top_side_of_screen = Vector2(object.position.x, object.position.y + SCREEN_HEIGHT)
+    var bottom_side_of_screen = Vector2(object.position.x ,object.position.y - SCREEN_HEIGHT)
+    var top_right_corner_of_screen = Vector2(object.position.x + SCREEN_WIDTH, object.position.y - SCREEN_HEIGHT)
+    var top_left_corner_of_screen = Vector2(object.position.x - SCREEN_WIDTH, object.position.y - SCREEN_HEIGHT)
+    var bottom_right_corner_of_screen = Vector2(object.position.x + SCREEN_WIDTH, object.position.y + SCREEN_HEIGHT)
+    var bottom_left_corner_of_screen = Vector2(object.position.x - SCREEN_WIDTH, object.position.y + SCREEN_HEIGHT)
+
+    return [
+        left_side_of_screen,
+        right_side_of_screen,
+        top_side_of_screen,
+        bottom_side_of_screen,
+        top_left_corner_of_screen,
+        top_right_corner_of_screen,
+        bottom_left_corner_of_screen,
+        bottom_right_corner_of_screen
+    ]
