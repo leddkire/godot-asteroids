@@ -12,19 +12,35 @@ func issue_new_id():
 
 func add_entity_to_census(entity):
     var screen_id = entity.screen_id
-    if(entities_on_screen.has(screen_id)):
-        var entity_list : Array = entities_on_screen[screen_id]
-        if(entity_list.size() < max_number_of_entities_per_entry):
-            entity_list.push_front(entity)
-            print_debug("Added a new entity to the census with screen id: " + str(screen_id))
-            print_debug("Current entities with that same screen id: " + str(entities_on_screen[screen_id]))
+    if is_in_census(entity.screen_id):
+        var entity_list : Array = census_entry(entity.screen_id)
+        if within_maximum_allowed_entities(entity_list.size()):
+                add_to_existing_census_entry(entity_list, entity)
         else:
             printerr("Attempted to exceed max allowed entities in census: " + entity.name + " with screen id: " + screen_id)
     else:
-        entities_on_screen[screen_id] = [entity]
+        add_new_census_entry(entity)
+
+func is_in_census(screen_id):
+    return entities_on_screen.has(screen_id)
+
+func census_entry(screen_id):
+    return entities_on_screen[screen_id]
+
+func within_maximum_allowed_entities(census_entry_size):
+    return census_entry_size  < max_number_of_entities_per_entry
+
+func add_to_existing_census_entry(census_entry, entity):
+    census_entry.push_front(entity)
+    print_debug("Added a new entity to the census with screen id: " + str(entity.screen_id))
+    print_debug("Current entities with that same screen id: " + str(entities_on_screen[entity.screen_id]))
+
+func add_new_census_entry(entity):
+    entities_on_screen[entity.screen_id] = [entity]
 
 func get_in_census(screen_id):
-    if(entities_on_screen.has(screen_id)):
-        return entities_on_screen[screen_id].duplicate(true)
+    if is_in_census(screen_id):
+        var deep_copy = true
+        return entities_on_screen[screen_id].duplicate(deep_copy)
     else:
         printerr("Requested an entity list with a screen_id that wasn't found in the census: " + str(screen_id))
