@@ -16,7 +16,7 @@ func _ready():
 
 
 func _input(input_event : InputEvent):
-    if input_event.is_action("shoot_projectile"):
+    if input_event.is_action_pressed("shoot_projectile"):
         var pellet_shooting_angle = Vector2(1,1).rotated(self.rotation).angle()
         var pellet = spawn_pellet_projectile(get_projectile_spawn_position(), pellet_shooting_angle)
         self.get_parent().add_child(pellet)
