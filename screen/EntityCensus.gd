@@ -7,7 +7,7 @@ const max_number_of_entities_per_entry = 9
 
 func issue_new_id():
     last_id_issued+=1
-    print_debug("Issued a new screen id")
+    #print_debug("Issued a new screen id")
     return last_id_issued
 
 func add_entity_to_census(entity):
@@ -32,8 +32,8 @@ func within_maximum_allowed_entities(census_entry_size):
 
 func add_to_existing_census_entry(census_entry, entity):
     census_entry.push_front(entity)
-    print_debug("Added a new entity to the census with screen id: " + str(entity.screen_id))
-    print_debug("Current entities with that same screen id: " + str(entities_on_screen[entity.screen_id]))
+    #print_debug("Added a new entity to the census with screen id: " + str(entity.screen_id))
+    #print_debug("Current entities with that same screen id: " + str(entities_on_screen[entity.screen_id]))
 
 func add_new_census_entry(entity):
     entities_on_screen[entity.screen_id] = [entity]
