@@ -2,10 +2,18 @@ extends RigidBody2D
 class_name Asteroid
 
 var screen_id
+var size
+
+onready var splitting_rule_resource = load("res://rules/splitting/AsteroidSplittingRule.gd")
+var splitting_rule: AsteroidSplittingRule
 
 func _ready():
     self.custom_integrator = false
     add_to_group(GroupConstants.DRIFTS)
+    self.splitting_rule = splitting_rule_resource.new()
+
+func initialize(initial_size):
+    print_debug("Initialized new asteroid: " + self.name + " with size: " + size)
 
 func set_new_position(pos: Vector2):
     var current_velocity = self.linear_velocity
@@ -23,8 +31,9 @@ func pulverize():
     queue_free()
 
 func can_be_split() -> bool:
-    return false
+    return splitting_rule.can_be_split(self)
 
 func split():
-    queue_free()
-    return []
+    return splitting_rule.split(self)
+
+

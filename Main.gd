@@ -31,10 +31,18 @@ func spawn_asteroids(entity_screen_wrap_rule):
     var center_asteroid = asteroid_scene.instance()
     center_asteroid.position = Vector2(100,100) # Position should be random
     add_child(center_asteroid)
+    center_asteroid.size = "L"
     center_asteroid.screen_id = EntityCensus.issue_new_id()
     EntityCensus.add_entity_to_census(center_asteroid)
-    var surrounding_asteroids = generate_screen_wrap_objects(asteroid_scene, 8, center_asteroid.screen_id)
+    var surrounding_asteroids = generate_asteroid_screen_wrap_objects(asteroid_scene, 8, center_asteroid.screen_id)
     entity_screen_wrap_rule.reposition_around(center_asteroid, surrounding_asteroids)
+
+func generate_asteroid_screen_wrap_objects(scene, amount_to_instance, screen_id):
+    var objects = []
+    for object in generate_screen_wrap_objects(scene, amount_to_instance, screen_id):
+        object.size = "L"
+        objects.append(object)
+    return objects
 
 func generate_screen_wrap_objects(scene, amount_to_instance, screen_id):
     var objects = []
