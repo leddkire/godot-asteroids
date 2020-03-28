@@ -9,7 +9,9 @@ func _init():
 
 func reposition_around(object,objects):
     for position in positions_around_screen(object):
-        objects.pop_front().set_new_position(position)
+        object = objects.pop_front()
+        if(object != null):
+            object.set_new_position(position)
 
 func positions_around_screen(object):
     var left_side_of_screen = Vector2(object.position.x + SCREEN_WIDTH, object.position.y)
