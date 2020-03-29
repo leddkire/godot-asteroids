@@ -34,11 +34,11 @@ func split(asteroid):
         var pieces_to_split = pieces_to_split_range[rand_range(0, pieces_to_split_range.size())]
 
         var split_asteroids = []
-        for _i in range(pieces_to_split):
+        for i in range(pieces_to_split):
             #print_debug("Splitting piece #" + str(i) + " from asteroid: " + self.name + " with size: " + size)
             var new_asteroid = scene.instance()
             new_asteroid.size = splitting_info["next_size"]
-            new_asteroid.screen_id = EntityCensus.issue_new_id()
+            new_asteroid.screen_id = str(asteroid.screen_id) + "_" + str(i)
             new_asteroid.position = asteroid.position
             EntityCensus.add_entity_to_census(new_asteroid)
             split_asteroids.append(new_asteroid)

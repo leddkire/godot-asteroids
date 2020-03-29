@@ -5,6 +5,8 @@
 		}
 	],
 	"settings": {
-		"godot_tools.editor_path": "d:\\Gamedev\\Tools\\Godot\\Godot-3.2\\Godot_v3.2-stable_win64.exe"
+		"godot_tools.editor_path": "d:\\Gamedev\\Tools\\Godot\\Godot-3.2\\Godot_v3.2-stable_win64.exe",
+		"editor.hover.enabled": false,
+		"editor.parameterHints.enabled": false
 	}
 }
