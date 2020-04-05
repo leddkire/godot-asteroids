@@ -8,11 +8,13 @@ onready var rotation_speed : float = 2.5
 onready var friction : float = 0.99
 onready var shooting_angle : float = 0
 var screen_id
+var ship_antenna
 
 func _ready():
     set_physics_process(true)
     add_to_group(GroupConstants.SHIP)
     add_to_group(GroupConstants.DRIFTS)
+    ship_antenna = ShipAntenna
 
 
 func _input(input_event : InputEvent):
@@ -24,7 +26,8 @@ func _input(input_event : InputEvent):
 func _physics_process(delta):
     self.rotation += calculate_rotation_direction_from_input() * self.rotation_speed * delta
     self.current_velocity_vector = calculate_movement_vector_based_on_input(self.current_velocity_vector, self.rotation, delta)
-    move_and_collide(self.current_velocity_vector)
+    var infinite_inertia = true
+    var collision = move_and_collide(self.current_velocity_vector, infinite_inertia)
 
 func calculate_movement_vector_based_on_input(velocity_vector, current_rotation, delta):
     if Input.is_action_pressed("move_up") :
@@ -81,3 +84,7 @@ func get_projectile_spawn_position():
 
 func set_new_position(pos: Vector2):
     self.position = pos
+
+func _on_Area2D_body_entered(body):
+    if body is Asteroid:
+        ship_antenna.ship_collided_with_asteroid()

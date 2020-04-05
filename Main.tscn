@@ -27,7 +27,6 @@ script = ExtResource( 1 )
 "ships",
 ] instance=ExtResource( 2 )]
 position = Vector2( 255, 235 )
-collision_layer = 2
 
 [node name="south_edge" parent="." instance=ExtResource( 3 )]
 script = ExtResource( 4 )

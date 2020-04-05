@@ -60,6 +60,8 @@ Orientation="*res://Orientation/Orientation.gd"
 Edge_Side="*res://edges/Edge_Side.gd"
 GroupConstants="*res://GroupConstants.gd"
 EntityCensus="*res://screen/EntityCensus.gd"
+ShipAntenna="*res://antennas/ShipAntenna.gd"
+PlayerLives="*res://lives/player/PlayerLives.gd"
 
 [display]
 
