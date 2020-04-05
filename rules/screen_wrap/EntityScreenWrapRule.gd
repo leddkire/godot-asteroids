@@ -10,7 +10,7 @@ func _init():
 func reposition_around(object,objects):
     for position in positions_around_screen(object):
         object = objects.pop_front()
-        if(object != null):
+        if is_instance_valid(object):
             object.set_new_position(position)
 
 func positions_around_screen(object):
