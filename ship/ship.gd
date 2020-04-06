@@ -10,11 +10,16 @@ onready var shooting_angle : float = 0
 var screen_id
 var ship_antenna
 
+const LEFT_DIRECTION = -1
+const RIGHT_DIRECTION  = 1
+const NO_DIRECTION  = 0
+
 func _ready():
     set_physics_process(true)
     add_to_group(GroupConstants.SHIP)
     add_to_group(GroupConstants.DRIFTS)
     ship_antenna = ShipAntenna
+    ship_antenna.connect("ship_collided_with_asteroid", self, "_on_ship_collided_with_asteroid")
 
 
 func _input(input_event : InputEvent):
@@ -39,38 +44,13 @@ func calculate_velocity(current_rotation):
 
 func calculate_rotation_direction_from_input():
     if Input.is_action_pressed("move_left"):
-       return -1
+       return LEFT_DIRECTION
     if Input.is_action_pressed("move_right") :
-        return 1
-    return 0
-
-func _on_collision_area_entered(area):
-    print("Entered: " + area.name)
-
-func on_outer_edge_exited():
-    self.disable_physics_detection()
-    self.hide_visuals()
-
-func disable_physics_detection():
-    self.collision_layer = 0
-    self.collision_mask = 1 #Only causes detection with the edge layer, which is bit 1
-
-func hide_visuals():
-    self.hide()
-
-func on_edge_entered():
-    if !is_showing_visuals() and physics_detection_is_disabled():
-        self.show_visuals()
-
-func is_showing_visuals():
-    return self.is_visible()
+        return RIGHT_DIRECTION
+    return NO_DIRECTION
 
 func physics_detection_is_disabled():
     return (self.collision_layer == 0) and (self.collision_mask == 1)
-
-
-func show_visuals():
-    self.show()
 
 var pellet_scn = preload("res://projectiles/pellet/pellet.tscn")
 func spawn_pellet_projectile(spawn_position : Vector2, projectile_rotation : float):
@@ -88,3 +68,14 @@ func set_new_position(pos: Vector2):
 func _on_Area2D_body_entered(body):
     if body is Asteroid:
         ship_antenna.ship_collided_with_asteroid()
+
+func _on_ship_collided_with_asteroid():
+    if $invincibility.is_stopped():
+        $AnimationPlayer.play("Invincibility")
+        $invincibility.start()
+        $Area2D.monitoring = false
+
+
+func _on_invincibility_timeout():
+    $AnimationPlayer.play("Idle")
+    $Area2D.monitoring = true
