@@ -37,8 +37,9 @@ tracks/1/keys = {
 "values": [ Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
 }
 
-[node name="ship" type="KinematicBody2D"]
-rotation = 1.5708
+[node name="ship" type="KinematicBody2D" groups=[
+"ships",
+]]
 collision_layer = 2
 collision_mask = 2
 script = ExtResource( 1 )
@@ -51,7 +52,6 @@ __meta__ = {
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 shape = SubResource( 1 )
 __meta__ = {
 "_edit_lock_": true
@@ -61,7 +61,6 @@ __meta__ = {
 position = Vector2( 0, -30 )
 
 [node name="Area2D" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource( 1 )
