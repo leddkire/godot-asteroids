@@ -3,6 +3,7 @@
 [ext_resource path="res://asteroids/Asteroid.gd" type="Script" id=1]
 
 [node name="Asteroid" type="RigidBody2D"]
+collision_layer = 4
 gravity_scale = 0.0
 linear_velocity = Vector2( -60, 60 )
 linear_damp = 0.0
