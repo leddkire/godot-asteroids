@@ -73,7 +73,7 @@ func _on_ship_collided_with_asteroid():
     if $invincibility.is_stopped():
         $AnimationPlayer.play("Invincibility")
         $invincibility.start()
-        $Area2D.monitoring = false
+        $Area2D.set_deferred("monitoring", false)
 
 
 func _on_invincibility_timeout():
