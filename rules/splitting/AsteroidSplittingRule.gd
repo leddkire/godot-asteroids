@@ -39,6 +39,10 @@ func split(asteroid):
             new_asteroid.size = splitting_info["next_size"]
             new_asteroid.screen_id = str(asteroid.screen_id) + "_" + str(i)
             new_asteroid.position = asteroid.position
+            var x_velocity = randi() % 60
+            var y_velocity = randi() % 60
+            new_asteroid.linear_velocity = Vector2(random_sign() * x_velocity, random_sign() * y_velocity)
+            #Fixme: Calling an autoload method that changes state. Makes unit-testing hard.
             EntityCensus.add_entity_to_census(new_asteroid)
             split_asteroids.append(new_asteroid)
             asteroid.get_parent().add_child(new_asteroid)
@@ -48,3 +52,10 @@ func split(asteroid):
     else:
         print_debug("An asteroid was expected to split, but it couldn't.")
         return []
+
+func random_sign():
+    var random_sign = randi() % 2
+    if random_sign == 0:
+        return -1
+    else:
+        return 1
