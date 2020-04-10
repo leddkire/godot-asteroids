@@ -10,6 +10,8 @@ onready var shooting_angle : float = 0
 var screen_id
 var ship_antenna
 
+var bullet_screen_id = 0
+
 const LEFT_DIRECTION = -1
 const RIGHT_DIRECTION  = 1
 const NO_DIRECTION  = 0
@@ -57,6 +59,9 @@ func spawn_pellet_projectile(spawn_position : Vector2, projectile_rotation : flo
     var pellet = pellet_scn.instance()
     pellet.position = spawn_position
     pellet.rotation = projectile_rotation
+    pellet.screen_id = str(self.screen_id) + "_bullet_" + str(bullet_screen_id)
+    EntityCensus.add_entity_to_census(pellet)
+    self.bullet_screen_id += 1
     return pellet
 
 func get_projectile_spawn_position():
