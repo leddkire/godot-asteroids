@@ -7,7 +7,10 @@ func _init():
     SCREEN_WIDTH = ProjectSettings.get_setting("display/window/size/width")
     SCREEN_HEIGHT = ProjectSettings.get_setting("display/window/size/height")
 
-func reposition_around(object,objects):
+func reposition_around(object,unduplicated_list):
+    assert(unduplicated_list.size() == 8)
+    var deep_copy = true
+    var objects = unduplicated_list.duplicate(deep_copy)
     for position in positions_around_screen(object):
         object = objects.pop_front()
         if is_instance_valid(object):

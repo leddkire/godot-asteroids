@@ -20,9 +20,10 @@ func _on_edge_exited(orientation : int, body, side_exited: int):
         if body.is_in_group(GroupConstants.DRIFTS):
             if (side_exited == Edge_Side.INNER and is_inside_screen(body)) :
                 var entities = entity_screen_census.get_in_census(body.screen_id)
-                if(entities != null):
+                assert(entities.size() == 9)
+                if(entities != null and !entities.empty()):
                     entities.erase(body)
-                    entity_screen_wrap_rule.reposition_around(body,entities)
+                    entity_screen_wrap_rule.call_deferred("reposition_around", body, entities)
 
 func is_inside_screen(body):
     var screen_width = ProjectSettings.get_setting("display/window/size/width")
