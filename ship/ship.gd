@@ -8,7 +8,10 @@ onready var rotation_speed : float = 2.5
 onready var friction : float = 0.99
 onready var shooting_angle : float = 0
 var screen_id
+var is_center_instance
 var ship_antenna
+
+var bullet_screen_id = 0
 
 const LEFT_DIRECTION = -1
 const RIGHT_DIRECTION  = 1
@@ -57,6 +60,9 @@ func spawn_pellet_projectile(spawn_position : Vector2, projectile_rotation : flo
     var pellet = pellet_scn.instance()
     pellet.position = spawn_position
     pellet.rotation = projectile_rotation
+    pellet.screen_id = str(self.screen_id) + "_bullet_" + str(bullet_screen_id)
+    EntityCensus.add_entity_to_census(pellet)
+    self.bullet_screen_id += 1
     return pellet
 
 func get_projectile_spawn_position():
@@ -73,7 +79,7 @@ func _on_ship_collided_with_asteroid():
     if $invincibility.is_stopped():
         $AnimationPlayer.play("Invincibility")
         $invincibility.start()
-        $Area2D.monitoring = false
+        $Area2D.set_deferred("monitoring", false)
 
 
 func _on_invincibility_timeout():

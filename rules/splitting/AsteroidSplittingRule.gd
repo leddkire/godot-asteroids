@@ -5,17 +5,17 @@ var scene
 var asteroid_splitting_table = {
     "L": {
         "shapes": [],
-        "pieces_to_split": range(2,3),
+        "pieces_to_split": 2,
         "next_size": "M"
     },
     "M": {
         "shapes": [],
-        "pieces_to_split": range(2,3),
+        "pieces_to_split": 2,
         "next_size": "S"
     },
     "S": {
         "shapes": [],
-        "pieces_to_split": range(2,3),
+        "pieces_to_split": 2,
         "next_size": null
     }
 }
@@ -28,23 +28,21 @@ func can_be_split(asteroid) -> bool:
     return next_size != null
 
 func split(asteroid):
+    var split_asteroids = []
     if(can_be_split(asteroid)):
         var splitting_info = asteroid_splitting_table[asteroid.size]
-        var pieces_to_split_range = splitting_info["pieces_to_split"]
-        var pieces_to_split = pieces_to_split_range[rand_range(0, pieces_to_split_range.size())]
 
-        var split_asteroids = []
-        for i in range(pieces_to_split):
-            #print_debug("Splitting piece #" + str(i) + " from asteroid: " + self.name + " with size: " + size)
+        for _i in range(splitting_info["pieces_to_split"]):
+            #print_debdug("Splitting piece #" + str(i) + " from asteroid: " + self.name + " with size: " + size)
             var new_asteroid = scene.instance()
-            new_asteroid.size = splitting_info["next_size"]
-            new_asteroid.screen_id = str(asteroid.screen_id) + "_" + str(i)
-            new_asteroid.position = asteroid.position
-            EntityCensus.add_entity_to_census(new_asteroid)
-            split_asteroids.append(new_asteroid)
-            asteroid.get_parent().call_deferred('add_child',new_asteroid)
-        asteroid.queue_free()
-        return split_asteroids
+            asteroid.get_parent().add_child(new_asteroid)
+            new_asteroid.initialize(asteroid.visible_instance_position(), splitting_info["next_size"])
+
+    return split_asteroids
+
+func random_sign():
+    var random_sign = randi() % 2
+    if random_sign == 0:
+        return -1
     else:
-        print_debug("An asteroid was expected to split, but it couldn't.")
-        return []
+        return 1

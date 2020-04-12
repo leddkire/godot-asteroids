@@ -7,11 +7,16 @@ func _init():
     SCREEN_WIDTH = ProjectSettings.get_setting("display/window/size/width")
     SCREEN_HEIGHT = ProjectSettings.get_setting("display/window/size/height")
 
-func reposition_around(object,objects):
-    for position in positions_around_screen(object):
-        object = objects.pop_front()
+func reposition_around(center_instance,unduplicated_list):
+    assert(unduplicated_list.size() == 8)
+    var deep_copy = true
+    var objects = unduplicated_list.duplicate(deep_copy)
+    center_instance.is_center_instance = true
+    for position in positions_around_screen(center_instance):
+        var object = objects.pop_front()
         if is_instance_valid(object):
             object.set_new_position(position)
+            object.is_center_instance = false
 
 func positions_around_screen(object):
     var left_side_of_screen = Vector2(object.position.x + SCREEN_WIDTH, object.position.y)

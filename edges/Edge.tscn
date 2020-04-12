@@ -17,4 +17,3 @@ shape = SubResource( 1 )
 [node name="outer_side" type="Position2D" parent="."]
 
 [node name="inner_side" type="Position2D" parent="."]
-[connection signal="body_entered" from="." to="." method="_on_collision_area_body_entered"]

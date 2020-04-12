@@ -9,10 +9,20 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "RigidBody2D",
+"base": "Node",
 "class": "Asteroid",
 "language": "GDScript",
 "path": "res://asteroids/Asteroid.gd"
+}, {
+"base": "RigidBody2D",
+"class": "AsteroidScreenInstance",
+"language": "GDScript",
+"path": "res://asteroids/AsteroidScreenInstance.gd"
+}, {
+"base": "Reference",
+"class": "AsteroidSpawningRule",
+"language": "GDScript",
+"path": "res://rules/position/AsteroidSpawningRule.gd"
 }, {
 "base": "Reference",
 "class": "AsteroidSplittingRule",
@@ -41,6 +51,8 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "Asteroid": "",
+"AsteroidScreenInstance": "",
+"AsteroidSpawningRule": "",
 "AsteroidSplittingRule": "",
 "BulletsWithAsteroidsRule": "",
 "Edge": "",
@@ -51,7 +63,7 @@ _global_script_class_icons={
 [application]
 
 config/name="My Asteroids Clone"
-run/main_scene="res://Main.tscn"
+run/main_scene="res://StartOfGame.tscn"
 config/icon="res://icon.png"
 
 [autoload]
@@ -62,6 +74,7 @@ GroupConstants="*res://GroupConstants.gd"
 EntityCensus="*res://screen/EntityCensus.gd"
 ShipAntenna="*res://antennas/ShipAntenna.gd"
 PlayerLives="*res://lives/player/PlayerLives.gd"
+AsteroidConfiguration="*res://asteroids/AsteroidConfiguration.gd"
 
 [display]
 
