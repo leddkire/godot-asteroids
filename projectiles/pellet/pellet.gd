@@ -2,6 +2,7 @@ extends Area2D
 
 export var speed : int = 10
 var screen_id
+var is_center_instance
 
 onready var bullet_with_asteroids_rule : BulletsWithAsteroidsRule = load("res://rules/collision/BulletsWithAsteroidsRule.gd").new()
 

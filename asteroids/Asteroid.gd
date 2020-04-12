@@ -4,7 +4,6 @@ class_name Asteroid
 var screen_id
 var size
 
-onready var splitting_rule_resource = load("res://rules/splitting/AsteroidSplittingRule.gd")
 var splitting_rule: AsteroidSplittingRule
 var screenwrap_rule: EntityScreenWrapRule
 var asteroid_instances = []
@@ -20,14 +19,19 @@ func _ready():
         var asteroid_screen_instance = child as AsteroidScreenInstance
         if asteroid_screen_instance != null:
             asteroid_screen_instance.connect("asteroid_hit_by_bullet", self, "_on_asteroid_hit_by_bullet")
-            asteroid_instances.push_front(child)
+            asteroid_instances.push_front(asteroid_screen_instance)
 
 func initialize(initial_position: Vector2, initial_size: String):
     self.size = initial_size
     self.screen_id = EntityCensus.issue_new_id()
 
+    var x_velocity = randi() % 60
+    var y_velocity = randi() % 60
+    var linear_velocity = Vector2(random_sign() * x_velocity, random_sign() * y_velocity)
+
     for instance in asteroid_instances:
         instance.screen_id = self.screen_id
+        instance.linear_velocity = linear_velocity
         EntityCensus.add_entity_to_census(instance)
 
     $initial_center_instance.set_new_position(initial_position)
@@ -49,20 +53,31 @@ func can_be_split():
     return splitting_rule.can_be_split(self)
 
 func split():
-    return splitting_rule.split(self)
+    return splitting_rule.new_split(self)
 
 func _on_asteroid_hit_by_bullet():
     signal_counter += 1
-    print("A screen instance has signalled that I've been hit by a bullet: " + str(signal_counter))
+    print("Asteroid signal hit by bullet: " + str(signal_counter))
     if(signal_counter == asteroid_instances.size()):
-        if(can_be_split()):
-            print("I will now split myself")
-            #split()
-            signal_counter = 0
-        else:
-            pulverize()
+        split()
+        pulverize()
+        signal_counter = 0
 
 func signal_switch():
     ignoring_signals = true
     yield()
     ignoring_signals = false
+
+func visible_instance_position():
+    for instance in asteroid_instances:
+        if(instance.is_center_instance):
+            return instance.position
+    printerr("No asteroid instance found on screen.")
+    return null
+
+func random_sign():
+    var random_sign = randi() % 2
+    if random_sign == 0:
+        return -1
+    else:
+        return 1

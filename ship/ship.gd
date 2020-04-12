@@ -8,6 +8,7 @@ onready var rotation_speed : float = 2.5
 onready var friction : float = 0.99
 onready var shooting_angle : float = 0
 var screen_id
+var is_center_instance
 var ship_antenna
 
 var bullet_screen_id = 0
