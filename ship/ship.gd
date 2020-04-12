@@ -72,7 +72,7 @@ func set_new_position(pos: Vector2):
     self.position = pos
 
 func _on_Area2D_body_entered(body):
-    if body is Asteroid:
+    if body is AsteroidScreenInstance:
         ship_antenna.ship_collided_with_asteroid()
 
 func _on_ship_collided_with_asteroid():
