@@ -42,15 +42,8 @@ func initialize(initial_position: Vector2, initial_size: String):
 
     print_debug("Initialized new asteroid: " + self.name + " with size: " + size)
 
-func set_new_position(pos: Vector2):
-    printerr("Not implemented")
-    pass
-
 func pulverize():
     queue_free()
-
-func can_be_split():
-    return splitting_rule.can_be_split(self)
 
 func split():
     return splitting_rule.split(self)
@@ -62,11 +55,6 @@ func _on_asteroid_hit_by_bullet():
         split()
         pulverize()
         signal_counter = 0
-
-func signal_switch():
-    ignoring_signals = true
-    yield()
-    ignoring_signals = false
 
 func visible_instance_position():
     for instance in asteroid_instances:
