@@ -53,7 +53,7 @@ func can_be_split():
     return splitting_rule.can_be_split(self)
 
 func split():
-    return splitting_rule.new_split(self)
+    return splitting_rule.split(self)
 
 func _on_asteroid_hit_by_bullet():
     signal_counter += 1
