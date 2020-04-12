@@ -5,6 +5,8 @@ var screen_id
 onready var splitting_rule_resource = load("res://rules/splitting/AsteroidSplittingRule.gd")
 var splitting_rule: AsteroidSplittingRule
 
+signal asteroid_hit_by_bullet
+
 func _ready():
     self.custom_integrator = false
     add_to_group(GroupConstants.DRIFTS)
@@ -32,4 +34,4 @@ func can_be_split() -> bool:
     return splitting_rule.can_be_split(self)
 
 func split():
-    return splitting_rule.split(self)
+    emit_signal("asteroid_hit_by_bullet")

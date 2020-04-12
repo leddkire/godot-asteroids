@@ -18,7 +18,7 @@ func _on_Timer_timeout():
 func pulverize():
     queue_free()
 
-func _on_pellet_body_entered(body : Asteroid):
+func _on_pellet_body_entered(body: AsteroidScreenInstance):
     if not body:
         return
     bullet_with_asteroids_rule.apply_rule(self,body)
