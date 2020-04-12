@@ -7,7 +7,7 @@ func _ready():
     var entity_screen_wrap_rule : EntityScreenWrapRule = load("res://rules/screen_wrap/EntityScreenWrapRule.gd").new()
     add_child(create_ship_position_controller(entity_screen_wrap_rule))
     spawn_ship(entity_screen_wrap_rule)
-    spawn_asteroids(entity_screen_wrap_rule)
+    spawn_asteroids()
 
 func create_ship_position_controller(wrap_rule: EntityScreenWrapRule):
     var edges : Array = get_tree().get_nodes_in_group("edges")
@@ -25,17 +25,12 @@ func spawn_ship(wrap_rule : EntityScreenWrapRule):
     ships = generate_screen_wrap_objects(shipScene, sides_and_corners_of_screen, central_ship.screen_id)
     wrap_rule.reposition_around(central_ship,ships)
 
-
-func spawn_asteroids(entity_screen_wrap_rule):
+func spawn_asteroids():
+    #Fixme: Refactor into Asteroid Factory
     var asteroid_scene = load("res://asteroids/Asteroid.tscn")
-    var center_asteroid = asteroid_scene.instance()
-    center_asteroid.position = Vector2(100,100) # Position should be random
-    add_child(center_asteroid)
-    center_asteroid.size = "L"
-    center_asteroid.screen_id = EntityCensus.issue_new_id()
-    EntityCensus.add_entity_to_census(center_asteroid)
-    var surrounding_asteroids = generate_asteroid_screen_wrap_objects(asteroid_scene, 8, center_asteroid.screen_id)
-    entity_screen_wrap_rule.reposition_around(center_asteroid, surrounding_asteroids)
+    var asteroid = asteroid_scene.instance()
+    add_child(asteroid)
+    asteroid.initialize(Vector2(100,100), "L")
 
 func generate_asteroid_screen_wrap_objects(scene, amount_to_instance, screen_id):
     var objects = []
