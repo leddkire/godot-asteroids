@@ -11,9 +11,9 @@ func _ready():
     spawn_asteroids()
 
 func spawn_asteroids():
-    var asteroid_spawning_rule = load("res://rules/position/AsteroidSpawningRule.gd").new()
+    var asteroid_spawning_rule: AsteroidSpawningRule = load("res://rules/position/AsteroidSpawningRule.gd").new()
     for _i in asteroids_to_spawn:
-        asteroid_spawning_rule.spawn_asteroid(self)
+        asteroid_spawning_rule.new_spawn_asteroid(self, Vector2(200,320), Vector2(160,320))
 
 func create_ship_position_controller(wrap_rule: EntityScreenWrapRule):
     var edges : Array = get_tree().get_nodes_in_group("edges")
