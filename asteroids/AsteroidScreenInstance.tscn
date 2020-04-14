@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://asteroids/AsteroidScreenInstance.gd" type="Script" id=1]
+
+[node name="AsteroidScreenInstance" type="RigidBody2D"]
+collision_layer = 4
+gravity_scale = 0.0
+linear_velocity = Vector2( -60, 60 )
+linear_damp = 0.0
+angular_velocity = 2.0
+angular_damp = 0.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PoolVector2Array( -15, 10, -20, -5, -5, -20, 15, -15, 20, -5, 10, 10, -10, 15 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+scale = Vector2( 4.30614, 4.54412 )
+color = Color( 0.698039, 0.556863, 0.556863, 1 )
+polygon = PoolVector2Array( -2.32227, 3.30097, 2.32227, 2.20065, 4.64453, -1.10032, 3.4834, -3.30097, -1.16113, -4.40129, -4.64453, -1.10032, -3.4834, 2.20065 )

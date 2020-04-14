@@ -8,6 +8,7 @@ onready var rotation_speed : float = 2.5
 onready var friction : float = 0.99
 onready var shooting_angle : float = 0
 var screen_id
+var is_center_instance
 var ship_antenna
 
 var bullet_screen_id = 0
@@ -71,7 +72,7 @@ func set_new_position(pos: Vector2):
     self.position = pos
 
 func _on_Area2D_body_entered(body):
-    if body is Asteroid:
+    if body is AsteroidScreenInstance:
         ship_antenna.ship_collided_with_asteroid()
 
 func _on_ship_collided_with_asteroid():

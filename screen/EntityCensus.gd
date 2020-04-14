@@ -31,16 +31,19 @@ func within_maximum_allowed_entities(census_entry_size):
     return census_entry_size  < max_number_of_entities_per_entry
 
 func add_to_existing_census_entry(census_entry, entity):
-    census_entry.push_front(entity)
+    census_entry.push_front(weakref(entity))
     #print_debug("Added a new entity to the census with screen id: " + str(entity.screen_id))
     #print_debug("Current entities with that same screen id: " + str(entities_on_screen[entity.screen_id]))
 
 func add_new_census_entry(entity):
-    entities_on_screen[entity.screen_id] = [entity]
+    entities_on_screen[entity.screen_id] = [weakref(entity)]
 
 func get_in_census(screen_id):
     if is_in_census(screen_id):
         var deep_copy = true
-        return entities_on_screen[screen_id].duplicate(deep_copy)
+        var entities = []
+        for ref in entities_on_screen[screen_id]:
+            entities.push_front(ref.get_ref())
+        return entities.duplicate(deep_copy)
     else:
         printerr("Requested an entity list with a screen_id that wasn't found in the census: " + str(screen_id))
