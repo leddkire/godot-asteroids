@@ -43,7 +43,7 @@ func add_new_census_entry(entity):
     var ref = weakref(entity)
     entities_on_screen[entity.screen_id] = [ref]
     var asteroid_instance = entity as AsteroidScreenInstance
-    if asteroid_instance :
+    if asteroid_instance:
         asteroids_on_screen[entity.screen_id] = [ref]
 
 func get_in_census(screen_id):

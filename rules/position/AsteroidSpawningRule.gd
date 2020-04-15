@@ -12,7 +12,7 @@ func _init():
 func _calculate_position(width_to_avoid: Vector2, height_to_avoid: Vector2) -> Vector2:
     randomize()
     var x = randi() % upper_x_limit
-    var x_outside_avoidance_range = x < width_to_avoid.x or x > width_to_avoid.y 
+    var x_outside_avoidance_range = x < width_to_avoid.x or x > width_to_avoid.y
     var y
     if(x_outside_avoidance_range):
         y = randi() % upper_y_limit
