@@ -5,13 +5,25 @@ var asteroid_scene
 func _init():
     self.asteroid_scene = load("res://asteroids/Asteroid.tscn")
 
-func _calculate_position() -> Vector2:
+func _calculate_position(width_to_avoid: Vector2, height_to_avoid: Vector2) -> Vector2:
+    randomize()
     var upper_y_limit = ProjectSettings.get_setting("display/window/size/height")
     var upper_x_limit = ProjectSettings.get_setting("display/window/size/width")
-    return Vector2(randi() % upper_x_limit, randi() % upper_y_limit)
+    var x_position = randi() % upper_x_limit
+    var y_position
+    if(x_position < width_to_avoid.x or x_position > width_to_avoid.y):
+        y_position = randi() % upper_y_limit
+    else:
+        var cuadrant = randi() % 2
+        if(cuadrant == 0):
+            y_position = randi() % int(height_to_avoid.x)
+        else:
+            y_position = randi() % int(upper_y_limit - height_to_avoid.y) + height_to_avoid.y
+    return Vector2(x_position, y_position)
 
-func spawn_asteroid(parent_node: Node) -> Asteroid:
+func spawn_asteroid(parent_node: Node, width_to_avoid: Vector2, height_to_avoid: Vector2) -> Asteroid:
     var asteroid = asteroid_scene.instance()
     parent_node.add_child(asteroid)
-    asteroid.initialize(_calculate_position(),"L")
+    asteroid.initialize(_calculate_position(width_to_avoid, height_to_avoid),"L")
     return asteroid
+
