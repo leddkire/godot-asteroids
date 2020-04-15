@@ -10,3 +10,7 @@ func _on_ship_collided_with_asteroid():
     print_debug("Lost a life. Left: " + str(lives))
     if(lives==0):
         print_debug("Player has died")
+        EndGameRule.end_game()
+
+func reset():
+    self.lives = 3
