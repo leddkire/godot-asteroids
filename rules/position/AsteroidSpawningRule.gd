@@ -1,9 +1,11 @@
 class_name AsteroidSpawningRule
 
 var asteroid_scene
+var factory
 
 func _init():
     self.asteroid_scene = load("res://asteroids/Asteroid.tscn")
+    self.factory = load("res://asteroids/AsteroidFactory.gd").new()
 
 func _calculate_position(width_to_avoid: Vector2, height_to_avoid: Vector2) -> Vector2:
     randomize()
@@ -22,8 +24,5 @@ func _calculate_position(width_to_avoid: Vector2, height_to_avoid: Vector2) -> V
     return Vector2(x_position, y_position)
 
 func spawn_asteroid(parent_node: Node, width_to_avoid: Vector2, height_to_avoid: Vector2) -> Asteroid:
-    var asteroid = asteroid_scene.instance()
-    parent_node.add_child(asteroid)
-    asteroid.initialize(_calculate_position(width_to_avoid, height_to_avoid),"L")
-    return asteroid
+    return factory.create(parent_node, _calculate_position(width_to_avoid, height_to_avoid), "L")
 

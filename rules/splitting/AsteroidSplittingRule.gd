@@ -1,6 +1,6 @@
 class_name AsteroidSplittingRule
 
-var scene
+var factory
 
 var asteroid_splitting_table = {
     "L": {
@@ -21,7 +21,7 @@ var asteroid_splitting_table = {
 }
 
 func _init():
-    scene = load("res://asteroids/Asteroid.tscn")
+    factory = load("res://asteroids/AsteroidFactory.gd").new()
 
 func can_be_split(asteroid) -> bool:
     var next_size = asteroid_splitting_table[asteroid.size]["next_size"]
@@ -34,9 +34,7 @@ func split(asteroid):
 
         for _i in range(splitting_info["pieces_to_split"]):
             #print_debdug("Splitting piece #" + str(i) + " from asteroid: " + self.name + " with size: " + size)
-            var new_asteroid = scene.instance()
-            asteroid.get_parent().add_child(new_asteroid)
-            new_asteroid.initialize(asteroid.visible_instance_position(), splitting_info["next_size"])
+            split_asteroids.append(factory.create(asteroid.get_parent(), asteroid.visible_instance_position(), splitting_info["next_size"]))
 
     return split_asteroids
 

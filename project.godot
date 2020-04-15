@@ -14,6 +14,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://asteroids/Asteroid.gd"
 }, {
+"base": "Reference",
+"class": "AsteroidFactory",
+"language": "GDScript",
+"path": "res://asteroids/AsteroidFactory.gd"
+}, {
 "base": "RigidBody2D",
 "class": "AsteroidScreenInstance",
 "language": "GDScript",
@@ -51,6 +56,7 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "Asteroid": "",
+"AsteroidFactory": "",
 "AsteroidScreenInstance": "",
 "AsteroidSpawningRule": "",
 "AsteroidSplittingRule": "",
