@@ -2,17 +2,19 @@ class_name EntityScreenWrapRule
 
 var SCREEN_WIDTH
 var SCREEN_HEIGHT
+const SCREEN_ENTITIES_MINUS_CENTER = 8
 
 func _init():
     SCREEN_WIDTH = ProjectSettings.get_setting("display/window/size/width")
     SCREEN_HEIGHT = ProjectSettings.get_setting("display/window/size/height")
 
-func reposition_around(center_instance,unduplicated_list):
-    assert(unduplicated_list.size() == 8)
+func reposition_around(new_center_instance,unduplicated_list):
+    assert(unduplicated_list.size() == SCREEN_ENTITIES_MINUS_CENTER)
     var deep_copy = true
     var objects = unduplicated_list.duplicate(deep_copy)
-    center_instance.is_center_instance = true
-    for position in positions_around_screen(center_instance):
+
+    new_center_instance.is_center_instance = true
+    for position in positions_around_screen(new_center_instance):
         var object = objects.pop_front()
         if is_instance_valid(object):
             object.set_new_position(position)
