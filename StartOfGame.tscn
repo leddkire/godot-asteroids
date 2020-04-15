@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://StartOfGame.gd" type="Script" id=1]
 [ext_resource path="res://ship/ship.tscn" type="PackedScene" id=2]
@@ -19,6 +19,21 @@ extents = Vector2( 5, 320 )
 
 [sub_resource type="RectangleShape2D" id=4]
 extents = Vector2( 5, 320 )
+
+[sub_resource type="GDScript" id=5]
+script/source = "extends Node2D
+
+signal start_game
+func _ready():
+    pass
+
+func _input(event):
+    if event.is_action_pressed(\"start_game\"):
+        emit_signal(\"start_game\")
+        self.get_tree().set_input_as_handled()
+        self.queue_free()
+
+"
 
 [node name="StartOfGame" type="Node2D"]
 script = ExtResource( 1 )
@@ -76,6 +91,24 @@ position = Vector2( -10, 255 )
 
 [node name="inner_side" parent="west_edge" index="2"]
 position = Vector2( 0, 255 )
+
+[node name="main_menu" type="Node2D" parent="."]
+script = SubResource( 5 )
+
+[node name="overlay" type="Polygon2D" parent="main_menu"]
+modulate = Color( 0, 0, 0, 1 )
+polygon = PoolVector2Array( 510, -10, 500, 510, -10, 510, -10, -10 )
+
+[node name="label" type="RichTextLabel" parent="main_menu"]
+margin_left = 190.0
+margin_top = 200.0
+margin_right = 328.0
+margin_bottom = 240.0
+text = "Press 'Space' to start."
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="start_game" from="main_menu" to="." method="start_game"]
 
 [editable path="south_edge"]
 
