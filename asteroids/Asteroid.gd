@@ -11,6 +11,8 @@ var asteroid_instances = []
 onready var ignoring_signals = false
 onready var signal_counter = 0
 
+signal asteroid_destroyed
+
 func _ready():
     AsteroidConfiguration.autowire(self)
     assert(splitting_rule != null)
@@ -43,6 +45,8 @@ func initialize(initial_position: Vector2, initial_size: String):
     print_debug("Initialized new asteroid: " + self.name + " with size: " + size)
 
 func pulverize():
+    if(self.size == "S"):
+        emit_signal("asteroid_destroyed")
     queue_free()
 
 func split():
