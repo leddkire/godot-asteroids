@@ -5,13 +5,15 @@ const sides_and_corners_of_screen = 8
 export (int) var asteroids_to_spawn = 5
 
 func _ready():
-    pass
+    get_tree().paused = true
+
 
 func start_game():
     var entity_screen_wrap_rule : EntityScreenWrapRule = load("res://rules/screen_wrap/EntityScreenWrapRule.gd").new()
     add_child(create_ship_position_controller(entity_screen_wrap_rule))
     spawn_ship(entity_screen_wrap_rule)
     spawn_asteroids()
+    get_tree().paused = false
 
 func spawn_asteroids():
     var asteroid_spawning_rule: AsteroidSpawningRule = load("res://rules/position/AsteroidSpawningRule.gd").new()

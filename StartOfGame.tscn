@@ -93,6 +93,7 @@ position = Vector2( -10, 255 )
 position = Vector2( 0, 255 )
 
 [node name="main_menu" type="Node2D" parent="."]
+pause_mode = 2
 script = SubResource( 5 )
 
 [node name="overlay" type="Polygon2D" parent="main_menu"]
