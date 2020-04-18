@@ -66,7 +66,7 @@ func spawn_pellet_projectile(spawn_position : Vector2, projectile_rotation : flo
     return pellet
 
 func get_projectile_spawn_position():
-    return get_node("projectile_spawn").global_position
+    return $ProjectileSpawn.global_position
 
 func set_new_position(pos: Vector2):
     self.position = pos
@@ -79,9 +79,9 @@ func _on_ship_collided_with_asteroid():
     if $invincibility.is_stopped():
         $AnimationPlayer.play("Invincibility")
         $invincibility.start()
-        $Area2D.set_deferred("monitoring", false)
+        $AsteroidCollision.set_deferred("monitoring", false)
 
 
 func _on_invincibility_timeout():
     $AnimationPlayer.play("Idle")
-    $Area2D.monitoring = true
+    $AsteroidCollision.monitoring = true
