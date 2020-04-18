@@ -1,10 +1,50 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://projectiles/pellet/pellet.gd" type="Script" id=1]
-[ext_resource path="res://projectiles/pellet/pellet.png" type="Texture" id=2]
+[ext_resource path="res://projectiles/pellet/cyan-sheet.png" type="Texture" id=2]
 
-[sub_resource type="CircleShape2D" id=1]
-radius = 2.5
+[sub_resource type="CapsuleShape2D" id=10]
+radius = 4.0
+
+[sub_resource type="Animation" id=9]
+resource_name = "bullet"
+length = 0.08
+step = 0.025
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.025, 0.05 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ 0, 1, 2 ]
+}
+
+[sub_resource type="AtlasTexture" id=6]
+flags = 4
+atlas = ExtResource( 2 )
+region = Rect2( 0, 0, 16, 28 )
+
+[sub_resource type="AtlasTexture" id=7]
+flags = 4
+atlas = ExtResource( 2 )
+region = Rect2( 16, 0, 16, 28 )
+
+[sub_resource type="AtlasTexture" id=8]
+flags = 4
+atlas = ExtResource( 2 )
+region = Rect2( 32, 0, 16, 28 )
+
+[sub_resource type="SpriteFrames" id=5]
+animations = [ {
+"frames": [ SubResource( 6 ), SubResource( 7 ), SubResource( 8 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
 
 [node name="pellet" type="Area2D"]
 script = ExtResource( 1 )
@@ -14,11 +54,19 @@ speed = 5
 one_shot = true
 autostart = true
 
-[node name="Sprite" type="Sprite" parent="."]
-texture = ExtResource( 2 )
-region_rect = Rect2( 585, 59, 198, 46 )
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource( 1 )
+rotation = -0.785398
+shape = SubResource( 10 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+autoplay = "bullet"
+anims/bullet = SubResource( 9 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+position = Vector2( 0, -4.76837e-07 )
+rotation = -0.785398
+scale = Vector2( 0.5, 1 )
+frames = SubResource( 5 )
+frame = 2
 [connection signal="body_entered" from="." to="." method="_on_pellet_body_entered"]
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
