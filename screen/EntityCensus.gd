@@ -5,9 +5,8 @@ var asteroids_on_screen: Dictionary = {}
 
 var last_id_issued = -1
 
-onready var constants = preload("res://screen/ScreenWrapConstants.gd")
-onready var max_number_of_entities_per_entry = constants.INSTANCES_ON_SCREEN
-
+var constants = preload("res://screen/ScreenWrapConstants.gd").new()
+var max_number_of_entities_per_entry = constants.INSTANCES_ON_SCREEN
 
 func issue_new_id():
     last_id_issued+=1
@@ -24,6 +23,7 @@ func add_entity_to_census(entity):
             printerr("Attempted to exceed max allowed entities in census: " + entity.name + " with screen id: " + screen_id)
     else:
         add_new_census_entry(entity)
+    return entities_on_screen
 
 func is_in_census(screen_id):
     return entities_on_screen.has(screen_id)
@@ -58,6 +58,7 @@ func get_in_census(screen_id):
         return entities.duplicate(deep_copy)
     else:
         printerr("Requested an entity list with a screen_id that wasn't found in the census: " + str(screen_id))
+        return []
 
 func asteroids():
     var counter = 0
