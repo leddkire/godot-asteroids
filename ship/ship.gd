@@ -4,7 +4,7 @@ onready var initial_velocity = 0
 var current_velocity_vector : Vector2 = Vector2(0,0)
 onready var thrust = 10
 onready var current_rotation_direction : int = 0
-onready var rotation_speed : float = 2.5
+onready var rotation_speed : float = 3
 onready var friction : float = 0.99
 onready var shooting_angle : float = 0
 var screen_id
