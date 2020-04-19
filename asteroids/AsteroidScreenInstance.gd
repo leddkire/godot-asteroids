@@ -14,9 +14,6 @@ func _ready():
     add_to_group(GroupConstants.DRIFTS)
     self.splitting_rule = splitting_rule_resource.new()
 
-func initialize(initial_size):
-        print_debug("Initialized new asteroid screen instance: " + self.name)
-
 func set_new_position(pos: Vector2):
     var current_velocity = self.linear_velocity
     # The empty _integrate_forces method ensures that the body doesn't move
