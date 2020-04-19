@@ -35,7 +35,9 @@ var _mouse = {
 	in_handle = false
 }
 var _is_running = false
-var _time = 0
+var _start_time = 0.0
+var _time = 0.0
+
 const DEFAULT_TITLE = 'Gut: The Godot Unit Testing tool.'
 var _utils = load('res://addons/gut/utils.gd').new()
 var _text_box_blocker_enabled = true
@@ -46,7 +48,6 @@ signal ignore_pause
 signal log_level_changed
 signal run_script
 signal run_single_script
-signal script_selected
 
 func _ready():
 	_pre_maximize_size = rect_size
@@ -60,9 +61,9 @@ func _ready():
 	_extras.visible = false
 	update()
 
-func _process(delta):
+func _process(_delta):
 	if(_is_running):
-		_time += delta
+		_time = OS.get_unix_time() - _start_time
 		var disp_time = round(_time * 100)/100
 		$TitleBar/Time.set_text(str(disp_time))
 
@@ -115,7 +116,7 @@ func _on_Previous_pressed():
 func _on_Next_pressed():
 	_select_script(get_selected_index() + 1)
 
-func _on_LogLevelSlider_value_changed(value):
+func _on_LogLevelSlider_value_changed(_value):
 	emit_signal('log_level_changed', $LogLevelSlider.value)
 
 func _on_Continue_pressed():
@@ -211,7 +212,8 @@ func _on_Maximize_pressed():
 # ####################
 func _run_mode(is_running=true):
 	if(is_running):
-		_time = 0
+		_start_time = OS.get_unix_time()
+		_time = _start_time
 		_summary.failing.set_text("0")
 		_summary.passing.set_text("0")
 	_is_running = is_running
@@ -292,13 +294,13 @@ func end_run():
 	_update_controls()
 
 func set_progress_script_max(value):
-	_progress.script.set_max(value)
+	_progress.script.set_max(max(value, 1))
 
 func set_progress_script_value(value):
 	_progress.script.set_value(value)
 
 func set_progress_test_max(value):
-	_progress.test.set_max(value)
+	_progress.test.set_max(max(value, 1))
 
 func set_progress_test_value(value):
 	_progress.test.set_value(value)
@@ -341,3 +343,5 @@ func maximize():
 	if(is_inside_tree()):
 		var vp_size_offset = get_viewport().size
 		rect_size = vp_size_offset / get_scale()
+		set_position(Vector2(0, 0))
+

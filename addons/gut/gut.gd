@@ -28,11 +28,12 @@
 ################################################################################
 # View readme for usage details.
 #
-# Version 6.7.0
+# Version 6.8.2
 ################################################################################
 #extends "res://addons/gut/gut_gui.gd"
 tool
 extends Control
+var _version = '6.8.2'
 
 var _utils = load('res://addons/gut/utils.gd').new()
 var _lgr = _utils.get_logger()
@@ -77,6 +78,15 @@ export(String, DIR) var _directory4 = ''
 export(String, DIR) var _directory5 = ''
 export(String, DIR) var _directory6 = ''
 export(int, 'FULL', 'PARTIAL') var _double_strategy = _utils.DOUBLE_STRATEGY.PARTIAL setget set_double_strategy, get_double_strategy
+export(String, FILE) var _pre_run_script = '' setget set_pre_run_script, get_pre_run_script
+export(String, FILE) var _post_run_script = '' setget set_post_run_script, get_post_run_script
+export(bool) var _color_output = false setget set_color_output, get_color_output
+
+# The instance that is created from _pre_run_script.  Accessible from
+# get_pre_run_script_instance.
+var _pre_run_script_instance = null
+var _post_run_script_instance = null # This is not used except in tests.
+
 # ###########################
 # Other Vars
 # ###########################
@@ -147,8 +157,11 @@ func _init():
 	_doubler.set_output_dir(_temp_directory)
 	_doubler.set_stubber(_stubber)
 	_doubler.set_spy(_spy)
-	_doubler.set_logger(_lgr)
+
 	_lgr.set_gut(self)
+	_doubler.set_logger(_lgr)
+	_spy.set_logger(_lgr)
+
 
 	_stubber.set_logger(_lgr)
 	_test_collector.set_logger(_lgr)
@@ -197,6 +210,10 @@ func _ready():
 	# hide the panel that IS gut so that only the GUI is seen
 	self.self_modulate = Color(1,1,1,0)
 	show()
+	var v_info = Engine.get_version_info()
+	p(str('Godot version:  ', v_info.major,  '.',  v_info.minor,  '.',  v_info.patch))
+	p(str('GUT version:  ', get_version()))
+
 
 ################################################################################
 #
@@ -216,7 +233,7 @@ func _setup_gui():
 	_gui.connect('end_pause', self, '_on_new_gui_end_pause')
 	_gui.connect('ignore_pause', self, '_on_new_gui_ignore_pause')
 	_gui.connect('log_level_changed', self, '_on_log_level_changed')
-	connect('tests_finished', _gui, 'end_run')
+	var _foo = connect('tests_finished', _gui, 'end_run')
 
 func _add_scripts_to_gui():
 	var scripts = []
@@ -266,13 +283,16 @@ func _on_log_level_changed(value):
 # ------------------------------------------------------------------------------
 func _yielding_callback(from_obj=false):
 	if(_yielding_to.obj):
-		_yielding_to.obj.disconnect(_yielding_to.signal_name, self, '_yielding_callback')
+		_yielding_to.obj.call_deferred(
+			"disconnect",
+			_yielding_to.signal_name, self,
+			'_yielding_callback')
 		_yielding_to.obj = null
 		_yielding_to.signal_name = ''
 
 	if(from_obj):
 		# we must yiled for a little longer after the signal is emitted so that
-		# the signal can propigate to other objects.  This was discovered trying
+		# the signal can propagate to other objects.  This was discovered trying
 		# to assert that obj/signal_name was emitted.  Without this extra delay
 		# the yield returns and processing finishes before the rest of the
 		# objects can get the signal.  This works b/c the timer will timeout
@@ -316,7 +336,7 @@ func _get_summary_text():
 
 	if(_new_summary.get_totals().tests > 0):
 		to_return +=  '+++ ' + str(_new_summary.get_totals().passing) + ' passed ' + str(_new_summary.get_totals().failing) + ' failed.  ' + \
-		              "Tests finished in:  " + str(_gui.get_run_duration()) + ' +++'
+					  "Tests finished in:  " + str(_gui.get_run_duration()) + ' +++'
 		var c = Color(0, 1, 0)
 		if(_new_summary.get_totals().failing > 0):
 			c = Color(1, 0, 0)
@@ -330,10 +350,47 @@ func _get_summary_text():
 
 	return to_return
 
+func _validate_hook_script(path):
+	var result = {
+		valid = true,
+		instance = null
+	}
+
+	# empty path is valid but will have a null instance
+	if(path == ''):
+		return result
+
+	var f = File.new()
+	if(f.file_exists(path)):
+		var inst = load(path).new()
+		if(inst and inst is _utils.HookScript):
+			result.instance = inst
+			result.valid = true
+		else:
+			result.valid = false
+			_lgr.error('The hook script [' + path + '] does not extend res://addons/gut/hook_script.gd')
+	else:
+		result.valid = false
+		_lgr.error('The hook script [' + path + '] does not exist.')
+
+	return result
+
+
+# ------------------------------------------------------------------------------
+# Runs a hook script.  Script must exist, and must extend
+# res://addons/gut/hook_script.gd
+# ------------------------------------------------------------------------------
+func _run_hook_script(inst):
+	if(inst != null):
+		inst.gut = self
+		inst.run()
+	return inst
+
 # ------------------------------------------------------------------------------
 # Initialize variables for each run of a single test script.
 # ------------------------------------------------------------------------------
 func _init_run():
+	var valid = true
 	_test_collector.set_test_class_prefix(_inner_class_prefix)
 	_test_script_objects = []
 	_new_summary = _utils.Summary.new()
@@ -353,15 +410,22 @@ func _init_run():
 	_gui.get_text_box().add_color_region('/-', '-/', Color(1, 1, 0))
 	_gui.get_text_box().add_color_region('/*', '*/', Color(.5, .5, 1))
 
+	var pre_hook_result = _validate_hook_script(_pre_run_script)
+	_pre_run_script_instance = pre_hook_result.instance
+	var post_hook_result = _validate_hook_script(_post_run_script)
+	_post_run_script_instance  = post_hook_result.instance
+
+	valid = pre_hook_result.valid and  post_hook_result.valid
+
+	return valid
+
+
 
 
 # ------------------------------------------------------------------------------
 # Print out run information and close out the run.
 # ------------------------------------------------------------------------------
 func _end_run():
-	var failed_tests = []
-	var more_than_one = _test_script_objects.size() > 1
-
 	p(_get_summary_text(), 0)
 	p("\n")
 	if(!_utils.is_null_or_empty(_select_script)):
@@ -381,8 +445,10 @@ func _end_run():
 
 	_is_running = false
 	update()
+	_run_hook_script(_post_run_script_instance)
 	emit_signal(SIGNAL_TESTS_FINISHED)
 	_gui.set_title("Finished.  " + str(get_fail_count()) + " failures.")
+
 
 # ------------------------------------------------------------------------------
 # Checks the passed in thing to see if it is a "function state" object that gets
@@ -390,8 +456,8 @@ func _end_run():
 # ------------------------------------------------------------------------------
 func _is_function_state(script_result):
 	return script_result != null and \
-	       typeof(script_result) == TYPE_OBJECT and \
-	       script_result is GDScriptFunctionState
+		   typeof(script_result) == TYPE_OBJECT and \
+		   script_result is GDScriptFunctionState
 
 # ------------------------------------------------------------------------------
 # Print out the heading for a new script
@@ -418,7 +484,7 @@ func _print_script_heading(script):
 # ------------------------------------------------------------------------------
 func _should_yield_now():
 	var should = _yield_between.should and \
-	             _yield_between.tests_since_last_yield == _yield_between.after_x_tests
+				 _yield_between.tests_since_last_yield == _yield_between.after_x_tests
 	if(should):
 		_yield_between.tests_since_last_yield = 0
 	else:
@@ -487,7 +553,7 @@ func _call_deprecated_script_method(script, method, alt):
 	if(script.has_method(method)):
 		var txt = str(script, '-', method)
 		if(!_deprecated_tracker.has(txt)):
-			# Removing the deprectated line.  I think it's still too early to
+			# Removing the deprecated line.  I think it's still too early to
 			# start bothering people with this.  Left everything here though
 			# because I don't want to remember how I did this last time.
 			#_lgr.deprecated(str('The method ', method, ' has been deprecated, use ', alt, ' instead.'))
@@ -519,7 +585,17 @@ func _get_indexes_matching_path(path):
 # yields.
 # ------------------------------------------------------------------------------
 func _test_the_scripts(indexes=[]):
-	_init_run()
+	var is_valid = _init_run()
+	if(!is_valid):
+		_lgr.error('Something went wrong and the run was aborted.')
+		return
+
+	_run_hook_script(_pre_run_script_instance)
+	if(_pre_run_script_instance!= null and _pre_run_script_instance.should_abort()):
+		_lgr.error('pre-run abort')
+		emit_signal(SIGNAL_TESTS_FINISHED)
+		return
+
 	_gui.run_mode()
 
 	var indexes_to_run = []
@@ -532,7 +608,6 @@ func _test_the_scripts(indexes=[]):
 	_gui.set_progress_script_max(indexes_to_run.size()) # New way
 	_gui.set_progress_script_value(0)
 
-	var file = File.new()
 	if(_doubler.get_strategy() == _utils.DOUBLE_STRATEGY.FULL):
 		_lgr.info("Using Double Strategy FULL as default strategy.  Keep an eye out for weirdness, this is still experimental.")
 
@@ -576,7 +651,7 @@ func _test_the_scripts(indexes=[]):
 			_current_test = the_script.tests[i]
 
 			if((_unit_test_name != '' and _current_test.name.find(_unit_test_name) > -1) or
-			   (_unit_test_name == '')):
+				(_unit_test_name == '')):
 				p(_current_test.name, 1)
 				_new_summary.add_test(_current_test.name)
 
@@ -612,6 +687,7 @@ func _test_the_scripts(indexes=[]):
 					_gui.get_text_box().add_keyword_color(_current_test.name, Color(1, 0, 0))
 
 				_gui.set_progress_test_value(i + 1)
+				_doubler.get_ignored_methods().clear()
 
 		# call both post-all-tests methods until postrun_teardown is removed.
 		if(_does_class_name_match(_inner_class_name, the_script.inner_class_name)):
@@ -638,21 +714,67 @@ func _pass(text=''):
 func _fail(text=''):
 	_gui.add_failing()
 	if(_current_test != null):
-		var line_text = ''
-		# Inner classes don't get the line number set so don't print it
-		# since -1 isn't helpful
-		if(_current_test.line_number != -1):
-			line_text = '  at line ' + str(_current_test.line_number)
-			p(line_text, LOG_LEVEL_FAIL_ONLY)
-			# format for summary
-			line_text =  "\n    " + line_text
+		var line_text = '  at line ' + str(_extractLineNumber( _current_test))
+		p(line_text, LOG_LEVEL_FAIL_ONLY)
+		# format for summary
+		line_text =  "\n    " + line_text
 
 		_new_summary.add_fail(_current_test.name, text + line_text)
 		_current_test.passed = false
 
+# Extracts the line number from curren stacktrace by matching the test case name
+func _extractLineNumber(current_test):
+	var line_number = current_test.line_number
+	# if stack trace available than extraxt the test case line number
+	var stackTrace = get_stack()
+	if(stackTrace!=null):
+		for index in stackTrace.size():
+			var line = stackTrace[index]
+			var function = line.get("function")
+			if function == current_test.name:
+				line_number = line.get("line")
+	return line_number
+
 func _pending(text=''):
 	if(_current_test):
 		_new_summary.add_pending(_current_test.name, text)
+
+# Gets all the files in a directory and all subdirectories if get_include_subdirectories
+# is true.  The files returned are all sorted by name.
+func _get_files(path, prefix, suffix):
+	var files = []
+	var directories = []
+
+	var d = Directory.new()
+	d.open(path)
+	# true parameter tells list_dir_begin not to include "." and ".." directories.
+	d.list_dir_begin(true)
+
+	# Traversing a directory is kinda odd.  You have to start the process of listing
+	# the contents of a directory with list_dir_begin then use get_next until it
+	# returns an empty string.  Then I guess you should end it.
+	var fs_item = d.get_next()
+	var full_path = ''
+	while(fs_item != ''):
+		full_path = path.plus_file(fs_item)
+
+		#file_exists returns fasle for directories
+		if(d.file_exists(full_path)):
+			if(fs_item.begins_with(prefix) and fs_item.ends_with(suffix)):
+				files.append(full_path)
+		elif(get_include_subdirectories() and d.dir_exists(full_path)):
+			directories.append(full_path)
+
+		fs_item = d.get_next()
+	d.list_dir_end()
+
+	for dir in range(directories.size()):
+		var dir_files = _get_files(directories[dir], prefix, suffix)
+		for i in range(dir_files.size()):
+			files.append(dir_files[i])
+
+	files.sort()
+	return files
 #########################
 #
 # public
@@ -664,6 +786,9 @@ func _pending(text=''):
 # current log level and what level is passed in.  Whenever currently in a test,
 # the text will be indented under the test.  It can be further indented if
 # desired.
+#
+# The first time output is generated when in a test, the test name will be
+# printed.
 # ------------------------------------------------------------------------------
 func p(text, level=0, indent=0):
 	var str_text = str(text)
@@ -672,13 +797,13 @@ func p(text, level=0, indent=0):
 
 	if(level <= _utils.nvl(_log_level, 0)):
 		if(_current_test != null):
-			#make sure everything printed during the execution
-			#of a test is at least indented once under the test
+			# make sure everything printed during the execution
+			# of a test is at least indented once under the test
 			if(indent == 0):
 				indent = 1
 
-			#Print the name of the current test if we haven't
-			#printed it already.
+			# Print the name of the current test if we haven't
+			# printed it already.
 			if(!_current_test.has_printed_name):
 				to_print = "* " + _current_test.name
 				_current_test.has_printed_name = true
@@ -687,15 +812,18 @@ func p(text, level=0, indent=0):
 		if(!printing_test_name):
 			if(to_print != ""):
 				to_print += "\n"
-			#Make the indent
+			# Make the indent
 			var pad = ""
-			for i in range(0, indent):
+			for _i in range(0, indent):
 				pad += "    "
 			to_print += pad + str_text
 			to_print = to_print.replace("\n", "\n" + pad)
 
 		if(_should_print_to_console):
-			print(to_print)
+			var formatted = to_print
+			if(_color_output):
+				formatted =  _utils.colorize_text(to_print)
+			print(formatted)
 
 		_log_text += to_print + "\n"
 
@@ -762,27 +890,10 @@ func add_directory(path, prefix=_file_prefix, suffix=_file_extension):
 		if(path != ''):
 			_lgr.error(str('The path [', path, '] does not exist.'))
 		return
-	d.open(path)
-	# true parameter tells list_dir_begin not to include "." and ".." diretories.
-	d.list_dir_begin(true)
 
-	# Traversing a directory is kinda odd.  You have to start the process of listing
-	# the contents of a directory with list_dir_begin then use get_next until it
-	# returns an empty string.  Then I guess you should end it.
-	var fs_item = d.get_next()
-	var full_path = ''
-	while(fs_item != ''):
-		full_path = path.plus_file(fs_item)
-
-		#file_exists returns fasle for directories
-		if(d.file_exists(full_path)):
-			if(fs_item.begins_with(prefix) and fs_item.ends_with(suffix)):
-				add_script(full_path)
-		elif(get_include_subdirectories() and d.dir_exists(full_path)):
-			add_directory(full_path, prefix, suffix)
-
-		fs_item = d.get_next()
-	d.list_dir_end()
+	var files = _get_files(path, prefix, suffix)
+	for i in range(files.size()):
+		add_script(files[i])
 
 # ------------------------------------------------------------------------------
 # This will try to find a script in the list of scripts to test that contains
@@ -922,7 +1033,7 @@ func get_should_print_to_console():
 
 # ------------------------------------------------------------------------------
 # Get the results of all tests ran as text.  This string is the same as is
-# displayed in the text box, and simlar to what is printed to the console.
+# displayed in the text box, and similar to what is printed to the console.
 # ------------------------------------------------------------------------------
 func get_result_text():
 	return _log_text
@@ -979,7 +1090,7 @@ func get_yield_between_tests():
 # the _process or _fixed_process methods.
 # ------------------------------------------------------------------------------
 func simulate(obj, times, delta):
-	for i in range(times):
+	for _i in range(times):
 		if(obj.has_method("_process")):
 			obj._process(delta)
 		if(obj.has_method("_physics_process")):
@@ -1018,7 +1129,7 @@ func set_yield_signal_or_time(obj, signal_name, max_wait, text=''):
 	_yield_timer.set_wait_time(max_wait)
 	_yield_timer.start()
 	_was_yield_method_called = true
-	p(str('/# Yielding to signal "', signal_name, '" or for ', max_wait, ' seconds #/'))
+	p(str('/# Yielding to signal "', signal_name, '" or for ', max_wait, ' seconds #/ ', text))
 	return self
 
 # ------------------------------------------------------------------------------
@@ -1063,12 +1174,8 @@ func is_file_empty(path):
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 func get_file_as_text(path):
-	var to_return = ''
-	var f = File.new()
-	f.open(path, f.READ)
-	to_return = f.get_as_text()
-	f.close()
-	return to_return
+	return _utils.get_file_as_text(path)
+
 # ------------------------------------------------------------------------------
 # deletes all files in a given directory
 # ------------------------------------------------------------------------------
@@ -1193,3 +1300,44 @@ func get_export_path():
 # ------------------------------------------------------------------------------
 func set_export_path(export_path):
 	_export_path = export_path
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+func get_version():
+	return _version
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+func get_pre_run_script():
+	return _pre_run_script
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+func set_pre_run_script(pre_run_script):
+	_pre_run_script = pre_run_script
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+func get_post_run_script():
+	return _post_run_script
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+func set_post_run_script(post_run_script):
+	_post_run_script = post_run_script
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+func get_pre_run_script_instance():
+	return _pre_run_script_instance
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+func get_post_run_script_instance():
+	return _post_run_script_instance
+
+func get_color_output():
+	return _color_output
+
+func set_color_output(color_output):
+	_color_output = color_output

@@ -63,11 +63,11 @@ class TestScript:
 			names.append(tests[i].name)
 		config_file.set_value(section, 'tests', names)
 
-	func _remap_path(path):
-		var to_return = path
-		if(!_utils.file_exists(path)):
-			_lgr.debug('Checking for remap for:  ' + path)
-			var remap_path = path.get_basename() + '.gd.remap'
+	func _remap_path(source_path):
+		var to_return = source_path
+		if(!_utils.file_exists(source_path)):
+			_lgr.debug('Checking for remap for:  ' + source_path)
+			var remap_path = source_path.get_basename() + '.gd.remap'
 			if(_utils.file_exists(remap_path)):
 				var cf = ConfigFile.new()
 				cf.load(remap_path)
@@ -215,10 +215,6 @@ func has_script(path):
 	return found
 
 func export_tests(path):
-	if(_utils.is_version_31()):
-		_lgr.error("Exporting and importing not supported in 3.1 yet.  There is a workaround, check the wiki.")
-		return false
-		
 	var success = true
 	var f = ConfigFile.new()
 	for i in range(scripts.size()):
@@ -230,9 +226,6 @@ func export_tests(path):
 	return success
 
 func import_tests(path):
-	if(_utils.is_version_31()):
-		_lgr.error("Exporting and importing not supported in 3.1 yet.  There is a workaround, check the wiki.")
-		return false
 	var success = false
 	var f = ConfigFile.new()
 	var result = f.load(path)

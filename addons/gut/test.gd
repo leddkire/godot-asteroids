@@ -37,6 +37,61 @@
 ################################################################################
 extends Node
 
+# ------------------------------------------------------------------------------
+# Helper class to hold info for objects to double.  This extracts info and has
+# some convenience methods.  This is key in being able to make the "smart double"
+# method which makes doubling much easier for the user.
+# ------------------------------------------------------------------------------
+class DoubleInfo:
+	var path
+	var subpath
+	var strategy
+	var make_partial
+	var extension
+	var _utils = load('res://addons/gut/utils.gd').new()
+	var _is_native = false
+
+	# Flexible init method.  p2 can be subpath or stategy unless p3 is
+	# specified, then p2 must be subpath and p3 is strategy.
+	#
+	# Examples:
+	#   (object_to_double)
+	#   (object_to_double, subpath)
+	#   (object_to_double, strategy)
+	#   (object_to_double, subpath, strategy)
+	func _init(thing, p2=null, p3=null):
+		strategy = p2
+
+		if(typeof(p2) == TYPE_STRING):
+			strategy = p3
+			subpath = p2
+
+		if(typeof(thing) == TYPE_OBJECT):
+			if(_utils.is_native_class(thing)):
+				path = thing
+				_is_native = true
+				extension = 'native_class_not_used'
+			else:
+				path = thing.resource_path
+		else:
+			path = thing
+
+		if(!_is_native):
+			extension = path.get_extension()
+
+	func is_scene():
+		return extension == 'tscn'
+
+	func is_script():
+		return extension == 'gd'
+
+	func is_native():
+		return _is_native
+
+# ------------------------------------------------------------------------------
+# Begin test.gd
+# ------------------------------------------------------------------------------
+
 # constant for signal when calling yield_for
 const YIELD = 'timeout'
 
@@ -105,7 +160,6 @@ var _signal_watcher = load('res://addons/gut/signal_watcher.gd').new()
 
 # Convenience copy of _utils.DOUBLE_STRATEGY
 var DOUBLE_STRATEGY = null
-
 var _utils = load('res://addons/gut/utils.gd').new()
 var _lgr = _utils.get_logger()
 
@@ -143,7 +197,7 @@ func _pass(text):
 # used in all the assertions that compare values.
 # ------------------------------------------------------------------------------
 func _do_datatypes_match__fail_if_not(got, expected, text):
-	var passed = true
+	var did_pass = true
 
 	if(!_disable_strict_datatype_checks):
 		var got_type = typeof(got)
@@ -155,9 +209,9 @@ func _do_datatypes_match__fail_if_not(got, expected, text):
 				_lgr.warn(str('Warn:  Float/Int comparison.  Got ', types[got_type], ' but expected ', types[expect_type]))
 			else:
 				_fail('Cannot compare ' + types[got_type] + '[' + str(got) + '] to ' + types[expect_type] + '[' + str(expected) + '].  ' + text)
-				passed = false
+				did_pass = false
 
-	return passed
+	return did_pass
 
 # ------------------------------------------------------------------------------
 # Create a string that lists all the methods that were called on an spied
@@ -199,6 +253,16 @@ func _fail_if_not_watching(object):
 func _get_fail_msg_including_emitted_signals(text, object):
 	return str(text," (Signals emitted: ", _signal_watcher.get_signals_emitted(object), ")")
 
+# ------------------------------------------------------------------------------
+# This validates that parameters is an array and generates a specific error
+# and a failure with a specific message
+# ------------------------------------------------------------------------------
+func _fail_if_parameters_not_array(parameters):
+	var invalid = parameters != null and typeof(parameters) != TYPE_ARRAY
+	if(invalid):
+		_lgr.error('The "parameters" parameter must be an array of expected parameter values.')
+		_fail('Cannot compare paramter values because an array was not passed.')
+	return invalid
 # #######################
 # Virtual Methods
 # #######################
@@ -435,7 +499,7 @@ func assert_accessors(obj, property, default, set_to):
 # If provided, property_usage constrains the type of property returned by
 # passing either:
 # EDITOR_PROPERTY for properties defined as: export(int) var some_value
-# VARIABLE_PROPERTY for properties definded as: var another_value
+# VARIABLE_PROPERTY for properties defunded as: var another_value
 # ---------------------------------------------------------------------------
 func _find_object_property(obj, property_name, property_usage=null):
 	var result = null
@@ -476,11 +540,61 @@ func _can_make_signal_assertions(object, signal_name):
 	return !(_fail_if_not_watching(object) or _fail_if_does_not_have_signal(object, signal_name))
 
 # ------------------------------------------------------------------------------
+# Check if an object is connected to a signal on another object. Returns True
+# if it is and false otherwise
+# ------------------------------------------------------------------------------
+func _is_connected(signaler_obj, connect_to_obj, signal_name, method_name=""):
+	if(method_name != ""):
+		return signaler_obj.is_connected(signal_name, connect_to_obj, method_name)
+	else:
+		var connections = signaler_obj.get_signal_connection_list(signal_name)
+		for conn in connections:
+			if((conn.source == signaler_obj) and (conn.target == connect_to_obj)):
+				return true
+		return false
+# ------------------------------------------------------------------------------
 # Watch the signals for an object.  This must be called before you can make
 # any assertions about the signals themselves.
 # ------------------------------------------------------------------------------
 func watch_signals(object):
 	_signal_watcher.watch_signals(object)
+
+# ------------------------------------------------------------------------------
+# Asserts that an object is connected to a signal on another object
+#
+# This will fail with specific messages if the target object is not connected
+# to the specified signal on the source object.
+# ------------------------------------------------------------------------------
+func assert_connected(signaler_obj, connect_to_obj, signal_name, method_name=""):
+	pass
+	var method_disp = ''
+	if (method_name != ""):
+		method_disp = str(' using method: [', method_name, '] ')
+	var disp = str('Expected object ', signaler_obj,\
+		' to be connected to signal: [', signal_name, '] on ',\
+		connect_to_obj, method_disp)
+	if(_is_connected(signaler_obj, connect_to_obj, signal_name, method_name)):
+		_pass(disp)
+	else:
+		_fail(disp)
+
+# ------------------------------------------------------------------------------
+# Asserts that an object is not connected to a signal on another object
+#
+# This will fail with specific messages if the target object is connected
+# to the specified signal on the source object.
+# ------------------------------------------------------------------------------
+func assert_not_connected(signaler_obj, connect_to_obj, signal_name, method_name=""):
+	var method_disp = ''
+	if (method_name != ""):
+		method_disp = str(' using method: [', method_name, '] ')
+	var disp = str('Expected object ', signaler_obj,\
+		' to not be connected to signal: [', signal_name, '] on ',\
+		connect_to_obj, method_disp)
+	if(_is_connected(signaler_obj, connect_to_obj, signal_name, method_name)):
+		_fail(disp)
+	else:
+		_pass(disp)
 
 # ------------------------------------------------------------------------------
 # Asserts that a signal has been emitted at least once.
@@ -549,7 +663,7 @@ func assert_signal_emit_count(object, signal_name, times, text=""):
 			_fail(_get_fail_msg_including_emitted_signals(disp, object))
 
 # ------------------------------------------------------------------------------
-# Assert that the passed in object has the specfied signal
+# Assert that the passed in object has the specified signal
 # ------------------------------------------------------------------------------
 func assert_has_signal(object, signal_name, text=""):
 	var disp = str('Expected object ', object, ' to have signal [', signal_name, ']:  ', text)
@@ -621,6 +735,39 @@ func assert_is(object, a_class, text=''):
 			else:
 				_fail(disp)
 
+func _get_typeof_string(the_type):
+	var to_return = ""
+	if(types.has(the_type)):
+		to_return += str(the_type, '(',  types[the_type], ')')
+	else:
+		to_return += str(the_type)
+	return to_return
+
+	# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+func assert_typeof(object, type, text=''):
+	var disp = str('Expected [typeof(', object, ') = ')
+	disp += _get_typeof_string(typeof(object))
+	disp += '] to equal ['
+	disp += _get_typeof_string(type) +  ']'
+	disp += '.  ' + text
+	if(typeof(object) == type):
+		_pass(disp)
+	else:
+		_fail(disp)
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+func assert_not_typeof(object, type, text=''):
+	var disp = str('Expected [typeof(', object, ') = ')
+	disp += _get_typeof_string(typeof(object))
+	disp += '] to not equal ['
+	disp += _get_typeof_string(type) +  ']'
+	disp += '.  ' + text
+	if(typeof(object) != type):
+		_pass(disp)
+	else:
+		_fail(disp)
 
 # ------------------------------------------------------------------------------
 # Assert that text contains given search string.
@@ -686,12 +833,15 @@ func assert_string_ends_with(text, search, match_case=true):
 # ------------------------------------------------------------------------------
 # Assert that a method was called on an instance of a doubled class.  If
 # parameters are supplied then the params passed in when called must match.
-# TODO make 3rd paramter "param_or_text" and add fourth parameter of "text" and
+# TODO make 3rd parameter "param_or_text" and add fourth parameter of "text" and
 #      then work some magic so this can have a "text" parameter without being
 #      annoying.
 # ------------------------------------------------------------------------------
 func assert_called(inst, method_name, parameters=null):
 	var disp = str('Expected [',method_name,'] to have been called on ',inst)
+
+	if(_fail_if_parameters_not_array(parameters)):
+		return
 
 	if(!_utils.is_double(inst)):
 		_fail('You must pass a doubled instance to assert_called.  Check the wiki for info on using double.')
@@ -711,6 +861,9 @@ func assert_called(inst, method_name, parameters=null):
 func assert_not_called(inst, method_name, parameters=null):
 	var disp = str('Expected [', method_name, '] to NOT have been called on ', inst)
 
+	if(_fail_if_parameters_not_array(parameters)):
+		return
+
 	if(!_utils.is_double(inst)):
 		_fail('You must pass a doubled instance to assert_not_called.  Check the wiki for info on using double.')
 	else:
@@ -728,6 +881,9 @@ func assert_not_called(inst, method_name, parameters=null):
 # ------------------------------------------------------------------------------
 func assert_call_count(inst, method_name, expected_count, parameters=null):
 	var count = gut.get_spy().call_count(inst, method_name, parameters)
+
+	if(_fail_if_parameters_not_array(parameters)):
+		return
 
 	var param_text = ''
 	if(parameters):
@@ -763,6 +919,19 @@ func assert_not_null(got, text=''):
 	else:
 		_pass(disp)
 
+# -----------------------------------------------------------------------------
+# Asserts object has been freed from memory
+# We pass in a title (since if it is freed, we lost all identity data)
+# -----------------------------------------------------------------------------
+func assert_freed(obj, title):
+	assert_true(not is_instance_valid(obj), "Object %s is freed" % title)
+
+# ------------------------------------------------------------------------------
+# Asserts Object has not been freed from memory
+# -----------------------------------------------------------------------------
+func assert_not_freed(obj, title):
+	assert_true(is_instance_valid(obj), "Object %s is not freed" % title)
+
 # ------------------------------------------------------------------------------
 # Mark the current test as pending.
 # ------------------------------------------------------------------------------
@@ -770,9 +939,9 @@ func pending(text=""):
 	_summary.pending += 1
 	if(gut):
 		if(text == ""):
-			gut.p("Pending")
+			gut.p("PENDING")
 		else:
-			gut.p("Pending:  " + text)
+			gut.p("PENDING:  " + text)
 		gut._pending(text)
 
 # ------------------------------------------------------------------------------
@@ -782,7 +951,7 @@ func pending(text=""):
 
 # ------------------------------------------------------------------------------
 # Yield for the time sent in.  The optional message will be printed when
-# Gut detects the yeild.  When the time expires the YIELD signal will be
+# Gut detects the yield.  When the time expires the YIELD signal will be
 # emitted.
 # ------------------------------------------------------------------------------
 func yield_for(time, msg=''):
@@ -849,32 +1018,54 @@ func get_summary_text():
 #
 #
 # ------------------------------------------------------------------------------
-func double(thing, p2=null, p3=null):
-	var strategy = p2
-	var subpath = null
 
-	if(typeof(p2) == TYPE_STRING):
-		strategy = p3
-		subpath = p2
-
-	var path = null
-	if(typeof(thing) == TYPE_OBJECT):
-		path = thing.resource_path
-	else:
-		path = thing
-
-	var extension = path.get_extension()
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+func _smart_double(double_info):
+	var override_strat = _utils.nvl(double_info.strategy, gut.get_doubler().get_strategy())
 	var to_return = null
 
-	if(extension == 'tscn'):
-		to_return =  double_scene(path, strategy)
-	elif(extension == 'gd'):
-		if(subpath == null):
-			to_return = double_script(path, strategy)
+	if(double_info.is_scene()):
+		if(double_info.make_partial):
+			to_return =  gut.get_doubler().partial_double_scene(double_info.path, override_strat)
 		else:
-			to_return = double_inner(path, subpath, strategy)
+			to_return =  gut.get_doubler().double_scene(double_info.path, override_strat)
 
+	elif(double_info.is_native()):
+		if(double_info.make_partial):
+			to_return = gut.get_doubler().partial_double_gdnative(double_info.path)
+		else:
+			to_return = gut.get_doubler().double_gdnative(double_info.path)
+
+	elif(double_info.is_script()):
+		if(double_info.subpath == null):
+			if(double_info.make_partial):
+				to_return = gut.get_doubler().partial_double(double_info.path, override_strat)
+			else:
+				to_return = gut.get_doubler().double(double_info.path, override_strat)
+		else:
+			if(double_info.make_partial):
+				to_return = gut.get_doubler().partial_double_inner(double_info.path, double_info.subpath, override_strat)
+			else:
+				to_return = gut.get_doubler().double_inner(double_info.path, double_info.subpath, override_strat)
 	return to_return
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+func double(thing, p2=null, p3=null):
+	var double_info = DoubleInfo.new(thing, p2, p3)
+	double_info.make_partial = false
+
+	return _smart_double(double_info)
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+func partial_double(thing, p2=null, p3=null):
+	var double_info = DoubleInfo.new(thing, p2, p3)
+	double_info.make_partial = true
+
+	return _smart_double(double_info)
+
 
 # ------------------------------------------------------------------------------
 # Specifically double a scene
@@ -896,6 +1087,22 @@ func double_script(path, strategy=null):
 func double_inner(path, subpath, strategy=null):
 	var override_strat = _utils.nvl(strategy, gut.get_doubler().get_strategy())
 	return gut.get_doubler().double_inner(path, subpath, override_strat)
+
+# ------------------------------------------------------------------------------
+# Add a method that the doubler will ignore.  You can pass this the path to a
+# script or scene or a loaded script or scene.  When running tests, these
+# ignores are cleared after every test.
+# ------------------------------------------------------------------------------
+func ignore_method_when_doubling(thing, method_name):
+	var double_info = DoubleInfo.new(thing)
+	var path = double_info.path
+
+	if(double_info.is_scene()):
+		var inst = thing.instance()
+		if(inst.get_script()):
+			path = inst.get_script().get_path()
+
+	gut.get_doubler().add_ignored_method(path, method_name)
 
 # ------------------------------------------------------------------------------
 # Stub something.
@@ -925,11 +1132,13 @@ func simulate(obj, times, delta):
 	gut.simulate(obj, times, delta)
 
 # ------------------------------------------------------------------------------
-# Replace the node at base_node.get_node(path) with with_this.  All refrences
+# Replace the node at base_node.get_node(path) with with_this.  All references
 # to the node via $ and get_node(...) will now return with_this.  with_this will
 # get all the groups that the node that was replaced had.
 #
 # The node that was replaced is queued to be freed.
+#
+# TODO see replace_by method, this could simplify the logic here.
 # ------------------------------------------------------------------------------
 func replace_node(base_node, path_or_node, with_this):
 	var path = path_or_node
@@ -941,7 +1150,7 @@ func replace_node(base_node, path_or_node, with_this):
 		# didn't look any farther).
 		path = base_node.get_path_to(path_or_node)
 		if(path.get_name_count() == 0):
-			_lgr.error('You passed an objet that base_node does not have.  Cannot replace node.')
+			_lgr.error('You passed an object that base_node does not have.  Cannot replace node.')
 			return
 
 	if(!base_node.has_node(path)):
