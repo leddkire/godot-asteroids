@@ -1,7 +1,10 @@
 extends Node
 
 signal ship_collided_with_asteroid
-const ships_in_game = 9
+
+onready var constants = preload("res://screen/ScreenWrapConstants.gd")
+onready var ships_in_game = constants.INSTANCES_ON_SCREEN
+
 var received_signals = 0
 
 func _ready():

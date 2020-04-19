@@ -4,7 +4,10 @@ var entities_on_screen : Dictionary = {}
 var asteroids_on_screen: Dictionary = {}
 
 var last_id_issued = -1
-const max_number_of_entities_per_entry = 9
+
+onready var constants = preload("res://screen/ScreenWrapConstants.gd")
+onready var max_number_of_entities_per_entry = constants.INSTANCES_ON_SCREEN
+
 
 func issue_new_id():
     last_id_issued+=1
