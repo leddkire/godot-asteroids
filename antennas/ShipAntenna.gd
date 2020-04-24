@@ -13,7 +13,7 @@ func _ready():
 func ship_collided_with_asteroid():
     received_signals = received_signals + 1
     if(received_signals == ships_in_game):
-        print_debug("Emitting antenna signal")
+        #print_debug("Emitting antenna signal")
         emit_signal("ship_collided_with_asteroid")
         reset_signal_counter()
 

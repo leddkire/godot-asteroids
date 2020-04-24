@@ -63,7 +63,7 @@ func initialize(initial_position: Vector2, initial_size: String):
     surrounding_instances.erase($initial_center_instance)
     screenwrap_rule.reposition_around($initial_center_instance, surrounding_instances)
 
-    print_debug("Initialized new asteroid: " + self.name + " with size: " + size)
+    #print_debug("Initialized new asteroid: " + self.name + " with size: " + size)
 
 func pulverize():
     if(self.size == "S"):
@@ -75,7 +75,7 @@ func split():
 
 func _on_asteroid_hit_by_bullet():
     signal_counter += 1
-    print("Asteroid signal hit by bullet: " + str(signal_counter))
+    #print("Asteroid signal hit by bullet: " + str(signal_counter))
     if(signal_counter == asteroid_instances.size()):
         split()
         pulverize()
