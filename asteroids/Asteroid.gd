@@ -3,6 +3,25 @@ class_name Asteroid
 
 var screen_id
 var size
+var size_to_instance = {
+}
+
+var large_asteroid_texture = preload("res://asteroids/large_asteroid_1.png")
+var medium_asteroid_texture = preload("res://asteroids/medium_asteroid_1.png")
+var small_asteroid_texture = preload("res://asteroids/small_asteroid_1.png")
+
+var size_to_texture = {
+    "L": self.large_asteroid_texture,
+    "M": self.medium_asteroid_texture,
+    "S": self.small_asteroid_texture
+}
+
+var size_to_polygons = {
+    "L": AsteroidCollisionPolygon.create_collision_polygon(self.large_asteroid_texture),
+    "M": AsteroidCollisionPolygon.create_collision_polygon(self.medium_asteroid_texture),
+    "S": AsteroidCollisionPolygon.create_collision_polygon(self.small_asteroid_texture)
+}
+
 
 var splitting_rule: AsteroidSplittingRule
 var screenwrap_rule: EntityScreenWrapRule
@@ -34,6 +53,8 @@ func initialize(initial_position: Vector2, initial_size: String):
     for instance in asteroid_instances:
         instance.screen_id = self.screen_id
         instance.linear_velocity = linear_velocity
+        instance.set_visuals(size_to_texture[self.size])
+        instance.set_collisions(size_to_polygons[self.size])
         EntityCensus.add_entity_to_census(instance)
 
     $initial_center_instance.set_new_position(initial_position)

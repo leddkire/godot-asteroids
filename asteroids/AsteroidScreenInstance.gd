@@ -39,3 +39,12 @@ func is_inside_screen():
     var screen_width = ProjectSettings.get_setting("display/window/size/width")
     var screen_height = ProjectSettings.get_setting("display/window/size/height")
     return self.position.x < screen_width and self.position.x > 0 and self.position.y < screen_height and self.position.y > 0
+
+func set_visuals(texture):
+    $Sprite.texture = texture
+
+func set_collisions(polygon):
+    $CollisionPolygon2D.set_polygon(polygon.polygons[0])
+    $CollisionPolygon2D.position = Vector2(-($Sprite.texture.get_width()/2),-($Sprite.texture.get_height()/2))
+
+
