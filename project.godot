@@ -88,6 +88,7 @@ ShipAntenna="*res://antennas/ShipAntenna.gd"
 PlayerLives="*res://lives/player/PlayerLives.gd"
 AsteroidConfiguration="*res://asteroids/AsteroidConfiguration.gd"
 EndGameRule="*res://rules/end/EndGameRule.gd"
+AsteroidCollisionPolygon="*res://asteroids/AsteroidCollisionPolygon.gd"
 
 [debug]
 
