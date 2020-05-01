@@ -15,9 +15,11 @@ func _init(moving_forward, rotation, vector, delta):
     self.delta = delta
 
 func calculate():
-    self.current_velocity_vector += _calculate_forward_propulsion(self.rotation) * delta
-    self.current_velocity_vector = self.current_velocity_vector * self.friction
-    return self.current_velocity_vector
+    return updated_velocity_vector() * self.friction
+
+func updated_velocity_vector():
+    return self.current_velocity_vector +  _calculate_forward_propulsion(self.rotation) * delta
+
 
 func _calculate_forward_propulsion(current_rotation):
     if self.moving_forward:
