@@ -5,9 +5,8 @@ onready var scene = load("res://ship/ShipInstance.tscn")
 
 func before_each():
     self.ship_instance = scene.instance()
-    # Given
-    var ship_instance: ShipInstance = load("res://ship/ShipInstance.tscn").instance()
 
+func test_invincibility_animation():
     # When
     ship_instance.become_invincible()
 
@@ -43,3 +42,15 @@ func test_collisions_when_vincible():
     var collision_object: Area2D = ship_instance.get_collision_node()
     assert_true(collision_object.monitoring)
 
+func test_set_new_position():
+    # Given
+    var positions = [
+        Vector2(0,0),
+        Vector2(10,20),
+        Vector2(-10,0)
+    ]
+    for position in positions:
+        # When
+        ship_instance.set_new_position(position)
+        # Then
+        assert_eq(ship_instance.position, position)
