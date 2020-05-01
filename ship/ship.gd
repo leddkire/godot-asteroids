@@ -38,17 +38,23 @@ func _physics_process(delta):
     var collision = move_and_collide(self.current_velocity_vector, infinite_inertia)
 
 func calculate_movement_vector_based_on_input(velocity_vector, current_rotation, delta):
+    $ForwardPropulsion.emitting = false
     if Input.is_action_pressed("move_up") :
         velocity_vector += calculate_velocity(current_rotation) * delta
+        $ForwardPropulsion.emitting = true
     return velocity_vector * self.friction
 
 func calculate_velocity(current_rotation):
     return Vector2(sin(current_rotation),-cos(current_rotation)) * self.thrust
 
 func calculate_rotation_direction_from_input():
+    $LeftPropulsion.emitting = false
+    $RightPropulsion.emitting = false
     if Input.is_action_pressed("move_left"):
-       return LEFT_DIRECTION
+        $RightPropulsion.emitting = true
+        return LEFT_DIRECTION
     if Input.is_action_pressed("move_right") :
+        $LeftPropulsion.emitting = true
         return RIGHT_DIRECTION
     return NO_DIRECTION
 
