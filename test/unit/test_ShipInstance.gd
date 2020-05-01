@@ -1,6 +1,10 @@
 extends "res://addons/gut/test.gd"
 
-func test_invincibility_animation():
+var ship_instance: ShipInstance
+onready var scene = load("res://ship/ShipInstance.tscn")
+
+func before_each():
+    self.ship_instance = scene.instance()
     # Given
     var ship_instance: ShipInstance = load("res://ship/ShipInstance.tscn").instance()
 
@@ -12,9 +16,6 @@ func test_invincibility_animation():
     assert_eq(animation_player.current_animation, ship_instance.invincibility_animation)
 
 func test_vincibility_animation():
-    # Given
-    var ship_instance: ShipInstance = load("res://ship/ShipInstance.tscn").instance()
-
     # When
     ship_instance.become_vincible()
 
@@ -24,7 +25,6 @@ func test_vincibility_animation():
 
 func test_collisions_when_invincible():
     # Given
-    var ship_instance: ShipInstance = load("res://ship/ShipInstance.tscn").instance()
     var doubled_object = partial_double(Node, DOUBLE_STRATEGY.FULL).new()
     replace_node(ship_instance,ship_instance.get_collision_node().name, doubled_object)
 
@@ -36,9 +36,6 @@ func test_collisions_when_invincible():
     assert_called(collision_object, "set_deferred", ["monitoring", false])
 
 func test_collisions_when_vincible():
-    # Given
-    var ship_instance: ShipInstance = load("res://ship/ShipInstance.tscn").instance()
-
     # When
     ship_instance.become_vincible()
 
