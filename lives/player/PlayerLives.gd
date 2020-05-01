@@ -3,7 +3,11 @@ extends Node
 var lives = 3
 
 func _ready():
-    ShipAntenna.connect("ship_collided_with_asteroid", self, "_on_ship_collided_with_asteroid")
+    pass
+
+func initialize(ship: Node):
+    ship.wire_collision_with_asteroid(self, "_on_ship_collided_with_asteroid")
+
 
 func _on_ship_collided_with_asteroid():
     lives -= 1

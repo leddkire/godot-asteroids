@@ -11,9 +11,19 @@ func _ready():
 func start_game():
     var entity_screen_wrap_rule : EntityScreenWrapRule = load("res://rules/screen_wrap/EntityScreenWrapRule.gd").new()
     add_child(create_ship_position_controller(entity_screen_wrap_rule))
-    spawn_ship(entity_screen_wrap_rule)
+    var ship = new_spawn_ship()
+    PlayerLives.initialize(ship)
     spawn_asteroids()
     get_tree().paused = false
+
+func new_spawn_ship():
+    var ship = load("res://ship/ship.tscn").instance()
+    add_child(ship)
+    ship.initialize(center_of_screen())
+    return ship
+
+func center_of_screen():
+    return Vector2(250,250)
 
 func spawn_asteroids():
     var asteroid_spawning_rule: AsteroidSpawningRule = load("res://rules/position/AsteroidSpawningRule.gd").new()
