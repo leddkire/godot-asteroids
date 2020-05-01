@@ -10,7 +10,6 @@ onready var friction : float = 0.99
 onready var shooting_angle : float = 0
 var screen_id
 var is_center_instance
-var ship_antenna
 
 var bullet_screen_id = 0
 
@@ -24,9 +23,6 @@ func _ready():
     set_physics_process(true)
     add_to_group(GroupConstants.SHIP)
     add_to_group(GroupConstants.DRIFTS)
-    ship_antenna = ShipAntenna
-    ship_antenna.connect("ship_collided_with_asteroid", self, "_on_ship_collided_with_asteroid")
-
 
 func _input(input_event : InputEvent):
     if input_event.is_action_pressed("shoot_projectile"):
@@ -83,16 +79,6 @@ func set_new_position(pos: Vector2):
 func _on_Area2D_body_entered(body):
     if body is AsteroidScreenInstance:
         emit_signal("instance_collided_with_asteroid")
-
-func _on_ship_collided_with_asteroid():
-    if $invincibility.is_stopped():
-        $AnimationPlayer.play("Invincibility")
-        $invincibility.start()
-        $AsteroidCollision.set_deferred("monitoring", false)
-
-func _on_invincibility_timeout():
-    $AnimationPlayer.play("Idle")
-    $AsteroidCollision.monitoring = true
 
 func become_invincible():
     $AnimationPlayer.play("Invincibility")
