@@ -1,6 +1,6 @@
  extends Node2D
 
-var shipScene = preload("res://ship/ship.tscn")
+var ship_scene = preload("res://ship/ship.tscn")
 const sides_and_corners_of_screen = 8
 export (int) var asteroids_to_spawn = 5
 
@@ -8,15 +8,14 @@ func _ready():
     get_tree().paused = true
 
 func start_game():
-    var entity_screen_wrap_rule : EntityScreenWrapRule = load("res://rules/screen_wrap/EntityScreenWrapRule.gd").new()
-    add_child(create_ship_position_controller(entity_screen_wrap_rule))
+    create_screen_wrap_controller()
     var ship = spawn_ship()
     PlayerLives.initialize(ship)
     spawn_asteroids()
     get_tree().paused = false
 
 func spawn_ship():
-    var ship = load("res://ship/ship.tscn").instance()
+    var ship = ship_scene.instance()
     add_child(ship)
     ship.initialize(center_of_screen())
     return ship
@@ -29,8 +28,9 @@ func spawn_asteroids():
     for _i in asteroids_to_spawn:
         asteroid_spawning_rule.spawn_asteroid(self, Vector2(200,320), Vector2(160,320))
 
-func create_ship_position_controller(wrap_rule: EntityScreenWrapRule):
+func create_screen_wrap_controller():
+    var wrap_rule : EntityScreenWrapRule = load("res://rules/screen_wrap/EntityScreenWrapRule.gd").new()
     var edges : Array = get_tree().get_nodes_in_group("edges")
     assert(edges.size() == 4)
-    var screenWrapController = load("res://ScreenWrapController/ScreenWrapController.gd").new(edges,wrap_rule,EntityCensus)
-    return screenWrapController
+    var screen_wrap_controller = load("res://ScreenWrapController/ScreenWrapController.gd").new(edges,wrap_rule,EntityCensus)
+    add_child(screen_wrap_controller)
