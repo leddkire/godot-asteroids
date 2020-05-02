@@ -1,6 +1,6 @@
 extends Node
 
-var lives = 3
+var lives = 5
 
 func _ready():
     pass
