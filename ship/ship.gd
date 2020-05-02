@@ -1,4 +1,5 @@
 extends Node
+class_name Ship
 
 var instances = []
 onready var screenwrap_rule = preload("res://rules/screen_wrap/EntityScreenWrapRule.gd").new()
