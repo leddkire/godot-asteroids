@@ -16,6 +16,12 @@ var rotation_vector_class = preload("res://ship/ShipRotationVector.gd")
 
 signal instance_collided_with_asteroid
 
+onready var action_to_thruster = {
+    "move_up" : $ForwardPropulsion,
+    "move_left" : $RightPropulsion,
+    "move_right" : $LeftPropulsion
+}
+
 func _ready():
     set_physics_process(true)
     add_to_group(GroupConstants.SHIP)
@@ -38,20 +44,11 @@ func _input(input_event : InputEvent):
         var pellet = _spawn_pellet_projectile(_get_projectile_spawn_position(), pellet_shooting_angle)
         self.get_parent().add_child(pellet)
 
-    if input_event.is_action_pressed("move_up"):
-        $ForwardPropulsion.emitting = true
-    if input_event.is_action_released("move_up"):
-        $ForwardPropulsion.emitting = false
-
-    if input_event.is_action_pressed("move_left"):
-        $RightPropulsion.emitting = true
-    if input_event.is_action_released("move_left"):
-        $RightPropulsion.emitting = false
-
-    if input_event.is_action_pressed("move_right"):
-        $LeftPropulsion.emitting = true
-    if input_event.is_action_released("move_right"):
-        $LeftPropulsion.emitting = false
+    for action in action_to_thruster.keys():
+        if(input_event.is_action_pressed(action)):
+            action_to_thruster[action].emitting = true
+        if(input_event.is_action_released(action)):
+            action_to_thruster[action].emitting = false
 
 func _physics_process(delta):
     self.rotation += _calculate_rotation_direction_from_input(delta)
