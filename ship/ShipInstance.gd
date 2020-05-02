@@ -2,7 +2,6 @@ extends KinematicBody2D
 class_name ShipInstance
 
 var current_velocity_vector : Vector2 = Vector2(0,0)
-onready var rotation_speed : float = 3
 onready var shooting_angle : float = 0
 var screen_id
 var is_center_instance
@@ -13,10 +12,7 @@ var invincibility_animation = "Invincibility"
 var idle_animation = "Idle"
 
 var ship_velocity_vector_class = preload("res://ship/ShipVelocityVector.gd")
-
-const LEFT_DIRECTION = -1
-const RIGHT_DIRECTION  = 1
-const NO_DIRECTION  = 0
+var rotation_vector_class = preload("res://ship/ShipRotationVector.gd")
 
 signal instance_collided_with_asteroid
 
@@ -58,24 +54,25 @@ func _input(input_event : InputEvent):
         $LeftPropulsion.emitting = false
 
 func _physics_process(delta):
-    self.rotation += _calculate_rotation_direction_from_input() * self.rotation_speed * delta
-
-    var ship_velocity_vector = ship_velocity_vector_class.new(
-        Input.is_action_pressed("move_up"), 
-        self.rotation, 
-        self.current_velocity_vector, 
-        delta)
-    self.current_velocity_vector = ship_velocity_vector.calculate()
-
+    self.rotation += _calculate_rotation_direction_from_input(delta)
+    self.current_velocity_vector = _calculate_forward_propulsion(delta)
     var infinite_inertia = true
     var collision = move_and_collide(self.current_velocity_vector, infinite_inertia)
 
-func _calculate_rotation_direction_from_input():
-    if Input.is_action_pressed("move_left"):
-        return LEFT_DIRECTION
-    if Input.is_action_pressed("move_right") :
-        return RIGHT_DIRECTION
-    return NO_DIRECTION
+func _calculate_rotation_direction_from_input(delta):
+    return rotation_vector_class.new(
+            Input.is_action_pressed("move_left"),
+            Input.is_action_pressed("move_right"),
+            delta
+        ).calculate()
+
+func _calculate_forward_propulsion(delta):
+    return ship_velocity_vector_class.new(
+            Input.is_action_pressed("move_up"),
+            self.rotation,
+            self.current_velocity_vector,
+            delta
+        ).calculate()
 
 var pellet_scn = preload("res://projectiles/pellet/pellet.tscn")
 func _spawn_pellet_projectile(spawn_position : Vector2, projectile_rotation : float):
