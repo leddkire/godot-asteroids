@@ -36,6 +36,7 @@ func _on_instance_collided_with_asteroid():
 func collided_with_asteroid():
     emit_signal("ship_collided_with_asteroid")
     if $invincibility.is_stopped():
+        $AsteroidCollision.play()
         $invincibility.start()
         for instance in instances:
             instance.become_invincible()
