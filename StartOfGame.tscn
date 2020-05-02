@@ -1,6 +1,7 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://StartOfGame.gd" type="Script" id=1]
+[ext_resource path="res://cameras/MainCamera.gd" type="Script" id=2]
 [ext_resource path="res://edges/Edge.tscn" type="PackedScene" id=3]
 [ext_resource path="res://edges/SouthEdge.gd" type="Script" id=4]
 [ext_resource path="res://edges/NorthEdge.gd" type="Script" id=5]
@@ -110,6 +111,11 @@ text = "Press 'Space' to start."
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="MainCamera" type="Camera2D" parent="."]
+anchor_mode = 0
+current = true
+script = ExtResource( 2 )
 [connection signal="start_game" from="main_menu" to="." method="start_game"]
 
 [editable path="south_edge"]

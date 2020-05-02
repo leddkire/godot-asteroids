@@ -11,6 +11,7 @@ func start_game():
     create_screen_wrap_controller()
     var ship = spawn_ship()
     PlayerLives.initialize(ship)
+    ship.wire_collision_with_asteroid($MainCamera, "moderate_shake")
     spawn_asteroids()
     get_tree().paused = false
 
