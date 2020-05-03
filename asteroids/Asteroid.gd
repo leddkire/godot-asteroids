@@ -66,11 +66,9 @@ func initialize(initial_position: Vector2, initial_size: String):
     #print_debug("Initialized new asteroid: " + self.name + " with size: " + size)
 
 func pulverize():
-    $Pulverized.play()
-    for instance in asteroid_instances:
-        instance.queue_free()
     if(self.size == "S"):
         emit_signal("asteroid_destroyed")
+    queue_free()
 
 func split():
     return splitting_rule.split(self)
@@ -96,7 +94,3 @@ func random_sign():
         return -1
     else:
         return 1
-
-
-func _on_Pulverized_finished():
-    queue_free()
