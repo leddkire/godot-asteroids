@@ -7,12 +7,25 @@ var instance_signal_counter = 0
 signal ship_collided_with_asteroid
 var screen_id
 
+onready var thruster_map = {
+    "move_up" : $ForwardThruster,
+    "move_left" : $RightThruster,
+    "move_right" : $LeftThruster
+}
+
 func _ready():
     for child in get_children():
         var instance = child as ShipInstance
         if instance != null:
             instance.connect("instance_collided_with_asteroid", self, "_on_instance_collided_with_asteroid")
             instances.push_front(instance)
+
+func _input(event):
+    for action in thruster_map.keys():
+        if event.is_action_pressed(action):
+            thruster_map[action].play()
+        if event.is_action_released(action):
+            thruster_map[action].stop()
 
 func initialize(initial_position: Vector2):
     self.screen_id = EntityCensus.issue_new_id()
