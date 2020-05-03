@@ -26,6 +26,9 @@ func _input(event):
             thruster_map[action].play()
         if event.is_action_released(action):
             thruster_map[action].stop()
+    if event.is_action_pressed("shoot_projectile"):
+        $Gun.play()
+
 
 func initialize(initial_position: Vector2):
     self.screen_id = EntityCensus.issue_new_id()
