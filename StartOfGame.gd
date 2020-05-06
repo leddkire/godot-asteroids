@@ -1,10 +1,12 @@
  extends Node2D
 
 var ship_scene = preload("res://ship/ship.tscn")
+export (Vector2) var play_area: Vector2 = Vector2(int(500),int(448))
 const sides_and_corners_of_screen = 8
 export (int) var asteroids_to_spawn = 5
 
 func _ready():
+    play_area = play_area.round()
     get_tree().paused = true
 
 func start_game():
@@ -25,7 +27,8 @@ func center_of_screen():
     return Vector2(250,250)
 
 func spawn_asteroids():
-    var asteroid_spawning_rule: AsteroidSpawningRule = load("res://rules/position/AsteroidSpawningRule.gd").new()
+    var asteroid_factory: AsteroidFactory = AsteroidFactory.new()
+    var asteroid_spawning_rule: AsteroidSpawningRule = load("res://rules/position/AsteroidSpawningRule.gd").new(asteroid_factory, play_area.x, play_area.y)
     for _i in asteroids_to_spawn:
         asteroid_spawning_rule.spawn_asteroid(self, Vector2(200,320), Vector2(160,320))
 
