@@ -7,13 +7,15 @@ export (int) var asteroids_to_spawn = 5
 
 func _ready():
     play_area = play_area.round()
+    $HUD.hide()
     get_tree().paused = true
 
 func start_game():
+    $HUD.show()
     var wrap_rule : EntityScreenWrapRule = load("res://rules/screen_wrap/EntityScreenWrapRule.gd").new(play_area.x, play_area.y)
     create_screen_wrap_controller(wrap_rule)
     var ship = spawn_ship(wrap_rule)
-    PlayerLives.initialize(ship)
+    PlayerLives.initialize(ship, $HUD)
     ship.wire_collision_with_asteroid($MainCamera, "moderate_shake")
     spawn_asteroids(wrap_rule)
     get_tree().paused = false
