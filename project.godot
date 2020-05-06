@@ -109,7 +109,6 @@ Edge_Side="*res://edges/Edge_Side.gd"
 GroupConstants="*res://GroupConstants.gd"
 EntityCensus="*res://screen/EntityCensus.gd"
 PlayerLives="*res://lives/player/PlayerLives.gd"
-AsteroidConfiguration="*res://asteroids/AsteroidConfiguration.gd"
 EndGameRule="*res://rules/end/EndGameRule.gd"
 AsteroidCollisionPolygon="*res://asteroids/AsteroidCollisionPolygon.gd"
 

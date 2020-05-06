@@ -1,13 +1,13 @@
 class_name AsteroidSpawningRule
 
 var factory
-var upper_y_limit
-var upper_x_limit
+var upper_y_limit: int
+var upper_x_limit: int
 
-func _init():
-    self.factory = load("res://asteroids/AsteroidFactory.gd").new()
-    upper_y_limit = ProjectSettings.get_setting("display/window/size/height")
-    upper_x_limit = ProjectSettings.get_setting("display/window/size/width")
+func _init(asteroid_factory: AsteroidFactory, upper_x_limit: int, upper_y_limit: int):
+    self.factory = asteroid_factory
+    self.upper_x_limit = upper_x_limit
+    self.upper_y_limit = upper_y_limit
 
 func _calculate_position(width_to_avoid: Vector2, height_to_avoid: Vector2) -> Vector2:
     randomize()

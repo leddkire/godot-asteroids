@@ -24,7 +24,6 @@ var size_to_polygons = {
 
 
 var splitting_rule: AsteroidSplittingRule
-var screenwrap_rule: EntityScreenWrapRule
 var asteroid_instances = []
 
 onready var ignoring_signals = false
@@ -33,18 +32,16 @@ onready var signal_counter = 0
 signal asteroid_destroyed
 
 func _ready():
-    AsteroidConfiguration.autowire(self)
-    assert(splitting_rule != null)
-    assert(screenwrap_rule != null)
     for child in get_children():
         var asteroid_screen_instance = child as AsteroidScreenInstance
         if asteroid_screen_instance != null:
             asteroid_screen_instance.connect("asteroid_hit_by_bullet", self, "_on_asteroid_hit_by_bullet")
             asteroid_instances.push_front(asteroid_screen_instance)
 
-func initialize(initial_position: Vector2, initial_size: String):
+func initialize(splitting_rule: AsteroidSplittingRule, screenwrap_rule: EntityScreenWrapRule, initial_position: Vector2, initial_size: String):
     self.size = initial_size
     self.screen_id = EntityCensus.issue_new_id()
+    self.splitting_rule = splitting_rule
 
     var x_velocity = randi() % 60
     var y_velocity = randi() % 60

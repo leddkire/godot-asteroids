@@ -1,37 +1,42 @@
  extends Node2D
 
 var ship_scene = preload("res://ship/ship.tscn")
+export (Vector2) var play_area: Vector2 = Vector2(int(500),int(448))
 const sides_and_corners_of_screen = 8
 export (int) var asteroids_to_spawn = 5
 
 func _ready():
+    play_area = play_area.round()
+    $HUD.hide()
     get_tree().paused = true
 
 func start_game():
-    create_screen_wrap_controller()
-    var ship = spawn_ship()
-    PlayerLives.initialize(ship)
+    $HUD.show()
+    var wrap_rule : EntityScreenWrapRule = load("res://rules/screen_wrap/EntityScreenWrapRule.gd").new(play_area.x, play_area.y)
+    create_screen_wrap_controller(wrap_rule)
+    var ship = spawn_ship(wrap_rule)
+    PlayerLives.initialize(ship, $HUD)
     ship.wire_collision_with_asteroid($MainCamera, "moderate_shake")
-    spawn_asteroids()
+    spawn_asteroids(wrap_rule)
     get_tree().paused = false
 
-func spawn_ship():
+func spawn_ship(wrap_rule: EntityScreenWrapRule):
     var ship = ship_scene.instance()
     add_child(ship)
-    ship.initialize(center_of_screen())
+    ship.initialize(center_of_screen(), wrap_rule)
     return ship
 
 func center_of_screen():
     return Vector2(250,250)
 
-func spawn_asteroids():
-    var asteroid_spawning_rule: AsteroidSpawningRule = load("res://rules/position/AsteroidSpawningRule.gd").new()
+func spawn_asteroids(wrap_rule: EntityScreenWrapRule):
+    var asteroid_factory: AsteroidFactory = AsteroidFactory.new(wrap_rule)
+    var asteroid_spawning_rule: AsteroidSpawningRule = AsteroidSpawningRule.new(asteroid_factory, play_area.x, play_area.y)
     for _i in asteroids_to_spawn:
         asteroid_spawning_rule.spawn_asteroid(self, Vector2(200,320), Vector2(160,320))
 
-func create_screen_wrap_controller():
-    var wrap_rule : EntityScreenWrapRule = load("res://rules/screen_wrap/EntityScreenWrapRule.gd").new()
+func create_screen_wrap_controller(wrap_rule: EntityScreenWrapRule):
     var edges : Array = get_tree().get_nodes_in_group("edges")
     assert(edges.size() == 4)
-    var screen_wrap_controller = load("res://ScreenWrapController/ScreenWrapController.gd").new(edges,wrap_rule,EntityCensus)
+    var screen_wrap_controller = ScreenWrapController.new(edges,wrap_rule,EntityCensus, play_area.x, play_area.y)
     add_child(screen_wrap_controller)

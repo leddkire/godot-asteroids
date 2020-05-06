@@ -2,7 +2,6 @@ extends Node
 class_name Ship
 
 var instances = []
-onready var screenwrap_rule = preload("res://rules/screen_wrap/EntityScreenWrapRule.gd").new()
 var instance_signal_counter = 0
 signal ship_collided_with_asteroid
 var screen_id
@@ -30,7 +29,7 @@ func _input(event):
         $Gun.play()
 
 
-func initialize(initial_position: Vector2):
+func initialize(initial_position: Vector2, screenwrap_rule: EntityScreenWrapRule):
     self.screen_id = EntityCensus.issue_new_id()
 
     for instance in instances:

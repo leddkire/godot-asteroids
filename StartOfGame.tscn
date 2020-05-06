@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://StartOfGame.gd" type="Script" id=1]
 [ext_resource path="res://cameras/MainCamera.gd" type="Script" id=2]
@@ -9,6 +9,8 @@
 [ext_resource path="res://edges/WestEdge.gd" type="Script" id=7]
 [ext_resource path="res://background/space_background.png" type="Texture" id=8]
 [ext_resource path="res://menus/main/MainMenu.tscn" type="PackedScene" id=9]
+[ext_resource path="res://ship/ship.png" type="Texture" id=10]
+[ext_resource path="res://hud/Hud.gd" type="Script" id=11]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 320, 5 )
@@ -22,6 +24,14 @@ extents = Vector2( 5, 320 )
 [sub_resource type="RectangleShape2D" id=4]
 extents = Vector2( 5, 320 )
 
+[sub_resource type="StyleBoxFlat" id=5]
+bg_color = Color( 0.294118, 0.294118, 0.294118, 1 )
+border_width_left = 2
+border_width_top = 3
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color( 0.92549, 0.92549, 0.92549, 1 )
+
 [node name="StartOfGame" type="Node2D"]
 position = Vector2( 0, -1 )
 script = ExtResource( 1 )
@@ -34,7 +44,7 @@ texture = ExtResource( 8 )
 script = ExtResource( 4 )
 
 [node name="collision_shape" parent="south_edge" index="0"]
-position = Vector2( 250, 505 )
+position = Vector2( 265, 456 )
 shape = SubResource( 1 )
 
 [node name="outer_side" parent="south_edge" index="1"]
@@ -89,6 +99,57 @@ script = ExtResource( 2 )
 [node name="MainMenu" parent="." instance=ExtResource( 9 )]
 pause_mode = 2
 position = Vector2( 128, 193 )
+
+[node name="HUD" type="Node2D" parent="."]
+z_index = 1
+script = ExtResource( 11 )
+
+[node name="Panel" type="Panel" parent="HUD"]
+margin_top = 451.0
+margin_right = 500.0
+margin_bottom = 501.0
+custom_styles/panel = SubResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/Panel"]
+margin_left = 25.0
+margin_top = 5.0
+margin_right = 155.0
+margin_bottom = 46.0
+custom_constants/separation = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="HUD/Panel/HBoxContainer"]
+margin_right = 48.0
+margin_bottom = 41.0
+texture = ExtResource( 10 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Label" type="Label" parent="HUD/Panel/HBoxContainer"]
+margin_left = 53.0
+margin_top = 13.0
+margin_right = 61.0
+margin_bottom = 27.0
+text = "X"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Lives" type="Label" parent="HUD/Panel/HBoxContainer"]
+margin_left = 66.0
+margin_top = 13.0
+margin_right = 74.0
+margin_bottom = 27.0
+text = "X"
+__meta__ = {
+"_edit_lock_": true
+}
 [connection signal="start_game" from="MainMenu" to="." method="start_game"]
 
 [editable path="south_edge"]

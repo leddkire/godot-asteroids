@@ -4,13 +4,17 @@ class_name ScreenWrapController
 var edges
 var entity_screen_wrap_rule : EntityScreenWrapRule
 var entity_screen_census: EntityCensus
+var play_area_width = ProjectSettings.get_setting("display/window/size/width")
+var play_area_height = ProjectSettings.get_setting("display/window/size/height")
 
 onready var constants = preload("res://screen/ScreenWrapConstants.gd")
 
 func _ready():
     self.set_name("ScreenWrapController")
 
-func _init(edges, entity_screen_wrap_rule, entity_screen_census: EntityCensus):
+func _init(edges, entity_screen_wrap_rule, entity_screen_census: EntityCensus, play_area_width: int, play_area_height: int):
+    self.play_area_width = play_area_width
+    self.play_area_height = play_area_height
     self.edges = edges
     self.entity_screen_wrap_rule = entity_screen_wrap_rule
     self.entity_screen_census = entity_screen_census
@@ -32,6 +36,4 @@ func exited_inner_edge(body, side_exited):
     return side_exited == Edge_Side.INNER and is_inside_screen(body)
 
 func is_inside_screen(body):
-    var screen_width = ProjectSettings.get_setting("display/window/size/width")
-    var screen_height = ProjectSettings.get_setting("display/window/size/height")
-    return body.position.x < screen_width and body.position.x > 0 and body.position.y < screen_height and body.position.y > 0
+    return body.position.x < play_area_width and body.position.x > 0 and body.position.y < play_area_height and body.position.y > 0
