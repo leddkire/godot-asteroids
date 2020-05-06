@@ -35,11 +35,6 @@ func can_be_split() -> bool:
 func split():
     emit_signal("asteroid_hit_by_bullet")
 
-func is_inside_screen():
-    var screen_width = ProjectSettings.get_setting("display/window/size/width")
-    var screen_height = ProjectSettings.get_setting("display/window/size/height")
-    return self.position.x < screen_width and self.position.x > 0 and self.position.y < screen_height and self.position.y > 0
-
 func set_visuals(texture):
     $Sprite.texture = texture
 
