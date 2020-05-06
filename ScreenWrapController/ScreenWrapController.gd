@@ -12,9 +12,9 @@ onready var constants = preload("res://screen/ScreenWrapConstants.gd")
 func _ready():
     self.set_name("ScreenWrapController")
 
-func _init(edges, entity_screen_wrap_rule, entity_screen_census: EntityCensus):
-    play_area_width = ProjectSettings.get_setting("display/window/size/width")
-    play_area_height = ProjectSettings.get_setting("display/window/size/height")
+func _init(edges, entity_screen_wrap_rule, entity_screen_census: EntityCensus, play_area_width: int, play_area_height: int):
+    self.play_area_width = play_area_width
+    self.play_area_height = play_area_height
     self.edges = edges
     self.entity_screen_wrap_rule = entity_screen_wrap_rule
     self.entity_screen_census = entity_screen_census

@@ -20,8 +20,8 @@ var asteroid_splitting_table = {
     }
 }
 
-func _init():
-    factory = load("res://asteroids/AsteroidFactory.gd").new()
+func _init(factory: AsteroidFactory):
+    self.factory = factory
 
 func can_be_split(asteroid) -> bool:
     var next_size = asteroid_splitting_table[asteroid.size]["next_size"]

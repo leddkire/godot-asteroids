@@ -4,9 +4,9 @@ var PLAY_AREA_WIDTH
 var PLAY_AREA_HEIGHT
 const SCREEN_ENTITIES_MINUS_CENTER = 8
 
-func _init():
-    PLAY_AREA_WIDTH = ProjectSettings.get_setting("display/window/size/width")
-    PLAY_AREA_HEIGHT = ProjectSettings.get_setting("display/window/size/height")
+func _init(play_area_height:int, play_area_width:int):
+    self.PLAY_AREA_WIDTH = play_area_height
+    self.PLAY_AREA_HEIGHT = play_area_width
 
 func reposition_around(new_center_instance,unduplicated_list):
     assert(unduplicated_list.size() == SCREEN_ENTITIES_MINUS_CENTER)
