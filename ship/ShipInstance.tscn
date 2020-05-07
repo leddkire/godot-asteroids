@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://ship/ShipInstance.gd" type="Script" id=1]
 [ext_resource path="res://ship/ship.png" type="Texture" id=2]
+[ext_resource path="res://ship/Explosions.tscn" type="PackedScene" id=3]
 
 [sub_resource type="Animation" id=1]
 resource_name = "Idle"
@@ -125,4 +126,10 @@ visible = false
 rotation = -3.14159
 scale = Vector2( 1, -1 )
 polygon = PoolVector2Array( -0.180351, -20.6137, 5.46648, -10.1505, 12.7742, -9.32006, 12.7742, -5.16797, 6.79515, -4.33755, 10.449, -1.8463, 11.7776, 3.30228, 20.414, 3.30228, 23.4035, 9.1152, 22.0748, 19.4124, 19.0853, 19.2463, 15.0993, 14.9281, 14.7672, 11.2743, 9.78465, 9.77954, 5.13432, 14.762, 0.15181, 14.762 )
+
+[node name="Explosions" parent="." instance=ExtResource( 3 )]
+emitting = false
+amount = 9
+local_coords = true
+anim_speed = 4.0
 [connection signal="body_entered" from="CollisionArea" to="." method="_on_Area2D_body_entered"]

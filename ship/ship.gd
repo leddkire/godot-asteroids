@@ -5,6 +5,7 @@ var instances = []
 var instance_signal_counter = 0
 signal ship_collided_with_asteroid
 var screen_id
+var exploding = false
 
 onready var thruster_map = {
     "move_up" : $ForwardThruster,
@@ -57,8 +58,16 @@ func collided_with_asteroid():
             instance.become_invincible()
 
 func _on_invincibility_timeout():
+    if(exploding):
+        queue_free()
     for instance in instances:
         instance.become_vincible()
 
 func wire_collision_with_asteroid(node: Node, handler_func_name: String):
     connect("ship_collided_with_asteroid", node, handler_func_name)
+
+func explode():
+    for instance in instances:
+        instance.explode()
+    exploding = true
+

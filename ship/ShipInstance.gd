@@ -90,3 +90,6 @@ func _on_Area2D_body_entered(body):
 
 func get_collision_node():
     return $CollisionArea
+
+func explode():
+    $Explosions.emitting = true
