@@ -12,9 +12,8 @@ func _on_asteroid_destroyed():
         end_game()
 
 func only_the_last_destroyed_asteroid_left():
-    var asteroids_left = EntityCensus.asteroids()
-    #print("Asteroids left: " + str(asteroids_left))
-    return asteroids_left == 1
+    var asteroids_in_scene = get_tree().get_nodes_in_group("asteroids").size()
+    return asteroids_in_scene == 1
 
 func end_game():
         yield(get_tree().create_timer(3.0), "timeout")

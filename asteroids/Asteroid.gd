@@ -34,6 +34,7 @@ signal asteroid_destroyed
 
 
 func _ready():
+    add_to_group("asteroids")
     for child in get_children():
         var asteroid_screen_instance = child as AsteroidScreenInstance
         if asteroid_screen_instance != null:
