@@ -12,7 +12,7 @@ func _ready():
 func create_ship_position_controller(wrap_rule: EntityScreenWrapRule):
     var edges : Array = get_tree().get_nodes_in_group("edges")
     assert(edges.size() == 4)
-    var screenWrapController = load("res://ScreenWrapController/ScreenWrapController.gd").new(edges,wrap_rule,EntityCensus)
+    var screenWrapController = ScreenWrapController.new(wrap_rule, 0, 0)
     return screenWrapController
 
 
@@ -20,8 +20,7 @@ func spawn_ship(wrap_rule : EntityScreenWrapRule):
     var ships : Array = get_tree().get_nodes_in_group("ships")
     assert(ships.size() == 1)
     var central_ship = ships.front()
-    central_ship.screen_id = EntityCensus.issue_new_id()
-    EntityCensus.add_entity_to_census(central_ship)
+    central_ship.screen_id = 0
     ships = generate_screen_wrap_objects(shipScene, sides_and_corners_of_screen, central_ship.screen_id)
     wrap_rule.reposition_around(central_ship,ships)
 
@@ -45,8 +44,7 @@ func generate_screen_wrap_objects(scene, amount_to_instance, screen_id):
         var object = scene.instance()
         add_child(object)
         objects.push_front(object)
-        object.screen_id = screen_id
-        EntityCensus.add_entity_to_census(object)
+        object.screen_id = 0
     return objects
 
 

@@ -77,8 +77,7 @@ func _spawn_pellet_projectile(spawn_position : Vector2, projectile_rotation : fl
     var pellet = pellet_scn.instance()
     pellet.position = spawn_position
     pellet.rotation = projectile_rotation
-    pellet.screen_id = str(self.screen_id) + "_bullet_" + str(bullet_screen_id)
-    EntityCensus.add_entity_to_census(pellet)
+    pellet.screen_id = 0
     self.bullet_screen_id += 1
     return pellet
 

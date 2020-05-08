@@ -33,12 +33,8 @@ func _input(event):
 
 
 func initialize(initial_position: Vector2, screenwrap_rule: EntityScreenWrapRule):
-    self.screen_id = EntityCensus.issue_new_id()
+    self.screen_id = 0
     self.screenwrap_rule = screenwrap_rule
-
-    for instance in instances:
-        instance.screen_id = self.screen_id
-        EntityCensus.add_entity_to_census(instance)
 
     $initial_center_instance.set_new_position(initial_position)
 

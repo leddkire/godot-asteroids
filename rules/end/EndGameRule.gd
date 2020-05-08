@@ -17,6 +17,5 @@ func only_the_last_destroyed_asteroid_left():
 
 func end_game():
         yield(get_tree().create_timer(3.0), "timeout")
-        EntityCensus.clear()
         PlayerLives.reset()
         self.get_tree().change_scene_to(start_of_game)

@@ -44,7 +44,7 @@ func _ready():
 
 func initialize(splitting_rule: AsteroidSplittingRule, screenwrap_rule: EntityScreenWrapRule, initial_position: Vector2, initial_size: String):
     self.size = initial_size
-    self.screen_id = EntityCensus.issue_new_id()
+    self.screen_id = 0
     self.splitting_rule = splitting_rule
     self.screenwrap_rule = screenwrap_rule
 
@@ -57,7 +57,6 @@ func initialize(splitting_rule: AsteroidSplittingRule, screenwrap_rule: EntitySc
         instance.linear_velocity = linear_velocity
         instance.set_visuals(size_to_texture[self.size])
         instance.set_collisions(size_to_polygons[self.size])
-        EntityCensus.add_entity_to_census(instance)
 
     $initial_center_instance.set_new_position(initial_position)
 
