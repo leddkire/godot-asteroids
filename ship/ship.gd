@@ -6,6 +6,7 @@ var instance_signal_counter = 0
 signal ship_collided_with_asteroid
 var screen_id
 var exploding = false
+var screenwrap_rule
 
 onready var thruster_map = {
     "move_up" : $ForwardThruster,
@@ -18,6 +19,7 @@ func _ready():
         var instance = child as ShipInstance
         if instance != null:
             instance.connect("instance_collided_with_asteroid", self, "_on_instance_collided_with_asteroid")
+            instance.connect("inside_play_area", self, "_on_instance_inside_play_area")
             instances.push_front(instance)
 
 func _input(event):
@@ -32,6 +34,7 @@ func _input(event):
 
 func initialize(initial_position: Vector2, screenwrap_rule: EntityScreenWrapRule):
     self.screen_id = EntityCensus.issue_new_id()
+    self.screenwrap_rule = screenwrap_rule
 
     for instance in instances:
         instance.screen_id = self.screen_id
@@ -71,3 +74,8 @@ func explode():
         instance.explode()
     exploding = true
 
+
+func _on_instance_inside_play_area(instance):
+    var surrounding_instances = instances.duplicate(true)
+    surrounding_instances.erase(instance)
+    self.screenwrap_rule.reposition_around(instance, surrounding_instances)

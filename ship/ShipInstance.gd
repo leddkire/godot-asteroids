@@ -15,6 +15,7 @@ var ship_velocity_vector_class = preload("res://ship/ShipVelocityVector.gd")
 var rotation_vector_class = preload("res://ship/ShipRotationVector.gd")
 
 signal instance_collided_with_asteroid
+signal inside_play_area(instance)
 
 onready var action_to_thruster = {
     "move_up" : $ForwardPropulsion,
@@ -93,3 +94,7 @@ func get_collision_node():
 
 func explode():
     $Explosions.emitting = true
+
+
+func inside_play_area():
+    emit_signal("inside_play_area", self)

@@ -5,8 +5,10 @@ var screen_id
 onready var splitting_rule_resource = load("res://rules/splitting/AsteroidSplittingRule.gd")
 
 signal asteroid_hit_by_bullet
+signal inside_play_area(instance)
 
 var is_center_instance
+
 
 func _ready():
     self.custom_integrator = false
@@ -37,4 +39,6 @@ func set_collisions(polygon):
     $CollisionPolygon2D.set_polygon(polygon.polygons[0])
     $CollisionPolygon2D.position = Vector2(-($Sprite.texture.get_width()/2),-($Sprite.texture.get_height()/2))
 
+func inside_play_area():
+    emit_signal("inside_play_area", self)
 

@@ -40,5 +40,5 @@ func spawn_asteroids(wrap_rule: EntityScreenWrapRule):
 func create_screen_wrap_controller(wrap_rule: EntityScreenWrapRule):
     var edges : Array = get_tree().get_nodes_in_group("edges")
     assert(edges.size() == 4)
-    var screen_wrap_controller = ScreenWrapController.new(edges,wrap_rule,EntityCensus, play_area.x, play_area.y)
+    var screen_wrap_controller = ScreenWrapController.new(edges,play_area.x, play_area.y)
     add_child(screen_wrap_controller)

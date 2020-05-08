@@ -26,3 +26,6 @@ func _on_pellet_body_entered(body: AsteroidScreenInstance):
 
 func set_new_position(pos: Vector2):
     self.position = pos
+
+func inside_play_area():
+    pass
