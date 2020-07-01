@@ -1,5 +1,5 @@
 extends Node
-class_name ScreenWrapController
+class_name InstanceEdgeSensor
 
 var edges
 var play_area_width = ProjectSettings.get_setting("display/window/size/width")
@@ -8,7 +8,7 @@ var play_area_height = ProjectSettings.get_setting("display/window/size/height")
 onready var constants = preload("res://screen/ScreenWrapConstants.gd")
 
 func _ready():
-    self.set_name("ScreenWrapController")
+    self.set_name("InstanceEdgeSensor")
 
 func _init(edges, play_area_width: int, play_area_height: int):
     self.play_area_width = play_area_width
