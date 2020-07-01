@@ -4,9 +4,9 @@ class_name Ship
 var instances = []
 var instance_signal_counter = 0
 signal ship_collided_with_asteroid
-var screen_id
 var exploding = false
-var screenwrap_rule
+var wrap_controller
+onready var wrap_controller_class = load("res://controllers/InstanceWrapController.gd")
 
 onready var thruster_map = {
     "move_up" : $ForwardThruster,
@@ -19,7 +19,6 @@ func _ready():
         var instance = child as ShipInstance
         if instance != null:
             instance.connect("instance_collided_with_asteroid", self, "_on_instance_collided_with_asteroid")
-            instance.connect("inside_play_area", self, "_on_instance_inside_play_area")
             instances.push_front(instance)
 
 func _input(event):
@@ -31,16 +30,8 @@ func _input(event):
     if event.is_action_pressed("shoot_projectile"):
         $Gun.play()
 
-
 func initialize(initial_position: Vector2, screenwrap_rule: EntityScreenWrapRule):
-    self.screen_id = 0
-    self.screenwrap_rule = screenwrap_rule
-
-    $initial_center_instance.set_new_position(initial_position)
-
-    var surrounding_instances = instances.duplicate(true)
-    surrounding_instances.erase($initial_center_instance)
-    screenwrap_rule.reposition_around($initial_center_instance, surrounding_instances)
+    self.wrap_controller = wrap_controller_class.new($initial_center_instance, instances, initial_position, screenwrap_rule)
 
 func _on_instance_collided_with_asteroid():
     instance_signal_counter += 1
@@ -69,9 +60,3 @@ func explode():
     for instance in instances:
         instance.explode()
     exploding = true
-
-
-func _on_instance_inside_play_area(instance):
-    var surrounding_instances = instances.duplicate(true)
-    surrounding_instances.erase(instance)
-    self.screenwrap_rule.reposition_around(instance, surrounding_instances)
