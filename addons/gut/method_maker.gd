@@ -16,7 +16,7 @@
 # }]
 # default_args []
 
-var _utils = load('res://addons/gut/utils.gd').new()
+var _utils = load('res://addons/gut/utils.gd').get_instance()
 var _lgr = _utils.get_logger()
 const PARAM_PREFIX = 'p_'
 
@@ -88,7 +88,7 @@ func _init():
 # ###############
 # Private
 # ###############
-var _func_text = _utils.get_file_as_text('res://addons/gut/double_templates/function_template.gd')
+var _func_text = _utils.get_file_as_text('res://addons/gut/double_templates/function_template.txt')
 
 func _is_supported_default(type_flag):
 	return type_flag >= 0 and type_flag < _supported_defaults.size() and [type_flag] != null
@@ -190,8 +190,10 @@ func get_super_call_text(meta):
 		params += PARAM_PREFIX + meta.args[i].name
 		if(meta.args.size() > 1 and i != meta.args.size() -1):
 			params += ', '
-
-	return str('.', meta.name, '(', params, ')')
+	if(meta.name == '_init'):
+		return 'null'
+	else:
+		return str('.', meta.name, '(', params, ')')
 
 func get_spy_call_parameters_text(meta):
 	var called_with = 'null'
