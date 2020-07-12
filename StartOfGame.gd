@@ -24,7 +24,9 @@ func start_game():
 func spawn_ship(wrap_rule: EntityScreenWrapRule):
     var ship = ship_scene.instance()
     add_child(ship)
-    ship.initialize(center_of_screen(), wrap_rule)
+    var wrap_controller_class = load("res://controllers/InstanceWrapController.gd")
+    var wrap_controller = wrap_controller_class.new(wrap_rule)
+    ship.initialize(wrap_controller, center_of_screen())
     PlayerLives.connect("player_died",ship,"explode")
     return ship
 

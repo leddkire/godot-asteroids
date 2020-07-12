@@ -1,11 +1,9 @@
-extends Node
+extends GameEntity
 class_name Ship
 
-var instances = []
 var instance_signal_counter = 0
 signal ship_collided_with_asteroid
 var exploding = false
-var wrap_controller
 
 onready var thruster_map = {
     "move_up" : $ForwardThruster,
@@ -15,11 +13,21 @@ onready var thruster_map = {
 
 func _ready():
     connect("ship_collided_with_asteroid", self, "collided_with_asteroid")
+
+func _on_instance_inside_play_area(instance):
+    self.wrap_controller.reposition(instance, instances)
+
+func initialize_instances():
+    var instances = []
     for child in get_children():
         var instance = child as ShipInstance
         if instance != null:
             instance.connect("instance_collided_with_asteroid", self, "_on_instance_collided_with_asteroid")
             instances.push_front(instance)
+    return instances
+
+func center_instance():
+    return $initial_center_instance
 
 func _input(event):
     for action in thruster_map.keys():
@@ -30,9 +38,9 @@ func _input(event):
     if event.is_action_pressed("shoot_projectile"):
         $Gun.play()
 
-func initialize(initial_position: Vector2, screenwrap_rule: EntityScreenWrapRule) -> void:
-    var wrap_controller_class = load("res://controllers/InstanceWrapController.gd")
-    self.wrap_controller = wrap_controller_class.new($initial_center_instance, instances, initial_position, screenwrap_rule)
+func initialize(wrap_controller: InstanceWrapController, initial_position: Vector2) -> void:
+    self.wrap_controller = wrap_controller
+    self.wrap_controller.initialize_positions($initial_center_instance, instances, initial_position)
 
 func _on_instance_collided_with_asteroid() -> void:
     instance_signal_counter += 1
